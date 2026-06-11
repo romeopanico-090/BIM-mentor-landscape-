@@ -21,6 +21,7 @@ const T = {
     next: "Pros →",
     screenshotLabel: "📎 Screenshot allegato",
     docsBtn: "📖 Docs",
+    videoBtn: "🎥 Video",
     lessonOf: (n, tot) => `Lezione ${n} di ${tot}`,
     sectionBase: "FONDAMENTA REVIT",
     sectionLandscape: "LANDSCAPE",
@@ -59,6 +60,7 @@ const T = {
     next: "Next →",
     screenshotLabel: "📎 Screenshot attached",
     docsBtn: "📖 Docs",
+    videoBtn: "🎥 Video",
     lessonOf: (n, tot) => `Lesson ${n} of ${tot}`,
     sectionBase: "REVIT FOUNDATIONS",
     sectionLandscape: "LANDSCAPE",
@@ -84,105 +86,105 @@ const DOCS = "https://help.autodesk.com/view/RVT/2025/ENU/?query=";
 
 // ── Curriculum IT ─────────────────────────────────────────────
 const CURRICULUM = [
-  { id: 1, section: "base", title: "User Interface", topics: ["Ribbon", "Properties panel", "Project Browser", "Plan Views", "Navigazione 3D"], objective: "Orientarsi in Revit e capire dove si trovano i controlli principali.", docsUrl: DOCS+"user%20interface", diagram: "ui", steps: [
+  { id: 1, section: "base", title: "User Interface", topics: ["Ribbon", "Properties panel", "Project Browser", "Plan Views", "Navigazione 3D"], objective: "Orientarsi in Revit e capire dove si trovano i controlli principali.", docsUrl: DOCS+"user%20interface", videoQuery: "Revit user interface tutorial beginner", diagram: "ui", steps: [
     { icon: "🖥️", label: "Apri Revit", desc: "Avvia Revit con un nuovo progetto, template Architectural." },
     { icon: "📌", label: "Esplora il Ribbon", desc: "Clicca su Architecture, Massing & Site, Annotate, View e osserva i pannelli. Massing & Site sarà la tua scheda chiave per la topografia." },
     { icon: "📋", label: "Properties Panel", desc: "A sinistra in alto: proprietà dell'elemento selezionato o della vista corrente. Abituati a guardarlo sempre." },
     { icon: "🗂️", label: "Project Browser", desc: "A sinistra in basso: tutte le viste, sheets, famiglie del progetto." },
     { icon: "🔍", label: "Area di disegno", desc: "Rotella per zoom, tasto centrale premuto per pan, Shift+centrale per orbit 3D." },
   ]},
-  { id: 2, section: "base", title: "Concetti BIM", topics: ["BIM vs CAD", "Livelli", "Griglie", "Il dato nel modello"], objective: "Capire la logica BIM: ogni elemento contiene informazioni reali.", docsUrl: DOCS+"levels%20grids", diagram: null, steps: [
+  { id: 2, section: "base", title: "Concetti BIM", topics: ["BIM vs CAD", "Livelli", "Griglie", "Il dato nel modello"], objective: "Capire la logica BIM: ogni elemento contiene informazioni reali.", docsUrl: DOCS+"levels%20grids", videoQuery: "Revit levels grids BIM basics", diagram: null, steps: [
     { icon: "💡", label: "BIM vs CAD", desc: "In CAD disegni linee. In Revit ogni elemento ha dati: materiale, costo, volume. Nel Landscape questo significa quantità di scavo, aree di pavimentazione, conteggi piante." },
     { icon: "📏", label: "Levels", desc: "Architecture → Datum → Level. Nel Landscape i livelli definiscono le quote di riferimento del sito." },
     { icon: "⊞", label: "Grids", desc: "Architecture → Datum → Grid. Assi di riferimento, utili nei progetti landscape di grande scala." },
   ]},
-  { id: 3, section: "base", title: "Wall", topics: ["System families", "Compound walls", "Edit structure"], objective: "Creare e modificare muri — base per retaining walls e planter walls.", docsUrl: DOCS+"walls", diagram: null, steps: [
+  { id: 3, section: "base", title: "Wall", topics: ["System families", "Compound walls", "Edit structure"], objective: "Creare e modificare muri — base per retaining walls e planter walls.", docsUrl: DOCS+"walls", videoQuery: "Revit wall tool tutorial", diagram: null, steps: [
     { icon: "🧱", label: "Wall Tool", desc: "Architecture → Build → Wall: Architectural." },
     { icon: "📐", label: "Scegli il tipo", desc: "Properties panel → tipo di muro. Duplica sempre prima di modificare." },
     { icon: "✏️", label: "Disegna", desc: "Due click nell'area di disegno. ESC per uscire." },
     { icon: "⚙️", label: "Edit Structure", desc: "Edit Type → Edit Structure: aggiungi strati e materiali. Stesso processo che userai per i muri di contenimento." },
   ]},
-  { id: 4, section: "base", title: "Floor", topics: ["Compound floors", "Sketch mode", "Boundary"], objective: "Il Floor è IL tool del Landscape: diventerà paving, grading, rampe.", docsUrl: DOCS+"floors", diagram: "floor", steps: [
+  { id: 4, section: "base", title: "Floor", topics: ["Compound floors", "Sketch mode", "Boundary"], objective: "Il Floor è IL tool del Landscape: diventerà paving, grading, rampe.", docsUrl: DOCS+"floors", videoQuery: "Revit floor tool tutorial", diagram: "floor", steps: [
     { icon: "⬛", label: "Floor Tool", desc: "Architecture → Build → Floor: Architectural. Entri in Sketch Mode." },
     { icon: "✏️", label: "Sketch Boundary", desc: "Disegna un perimetro chiuso con Boundary Line." },
     { icon: "✅", label: "Finish", desc: "Spunta verde per completare. Boundary aperta = errore." },
     { icon: "📐", label: "Edit Structure", desc: "Edit Type → Edit Structure: strati del pavimento. Nel Landscape qui definirai sub-base, allettamento e finitura della pavimentazione." },
   ]},
-  { id: 5, section: "base", title: "Component & Column", topics: ["Loadable components", "Site components", "Load Family"], objective: "Inserire componenti — arredi urbani, alberi, attrezzature.", docsUrl: DOCS+"components", diagram: null, steps: [
+  { id: 5, section: "base", title: "Component & Column", topics: ["Loadable components", "Site components", "Load Family"], objective: "Inserire componenti — arredi urbani, alberi, attrezzature.", docsUrl: DOCS+"components", videoQuery: "Revit component placement tutorial", diagram: null, steps: [
     { icon: "🪑", label: "Component Tool", desc: "Architecture → Build → Component. Nel Landscape: panchine, cestini, alberi, lampioni." },
     { icon: "📦", label: "Load Family", desc: "Insert → Load Family per caricare famiglie dalle librerie. Massing & Site → Site Component per gli elementi di sito." },
   ]},
-  { id: 6, section: "base", title: "Materiali", topics: ["Material browser", "Surface pattern", "Cut pattern"], objective: "Creare materiali — fondamentale per pavimentazioni e finiture esterne.", docsUrl: DOCS+"materials", diagram: null, steps: [
+  { id: 6, section: "base", title: "Materiali", topics: ["Material browser", "Surface pattern", "Cut pattern"], objective: "Creare materiali — fondamentale per pavimentazioni e finiture esterne.", docsUrl: DOCS+"materials", videoQuery: "Revit materials tutorial", diagram: null, steps: [
     { icon: "🎨", label: "Material Browser", desc: "Manage → Materials. Qui creerai i materiali di paving, ghiaia, prato, asfalto." },
     { icon: "➕", label: "Crea materiale", desc: "Clicca + → rinomina (es. 'Paving_Granito_600x600')." },
     { icon: "🖼️", label: "Surface Pattern", desc: "Tab Graphics → Surface Pattern: come appare in pianta. Per il paving è il pattern delle lastre." },
     { icon: "✂️", label: "Cut Pattern", desc: "Tab Graphics → Cut Pattern: il retino quando l'elemento è sezionato." },
   ]},
-  { id: 7, section: "base", title: "Famiglie — Parte 1", topics: ["System vs Loadable vs In-place", "Logica parametrica"], objective: "Capire le famiglie — nel Landscape userai molto le in-place e i profili.", docsUrl: DOCS+"families", diagram: null, steps: [
+  { id: 7, section: "base", title: "Famiglie — Parte 1", topics: ["System vs Loadable vs In-place", "Logica parametrica"], objective: "Capire le famiglie — nel Landscape userai molto le in-place e i profili.", docsUrl: DOCS+"families", videoQuery: "Revit families explained system loadable", diagram: null, steps: [
     { icon: "📦", label: "Cosa sono", desc: "Ogni elemento è una Famiglia. Floor e Wall sono system; alberi e arredi sono loadable; il drainage custom sarà in-place." },
     { icon: "🧱", label: "System Families", desc: "Muri, pavimenti, toposurface. Esistono solo nel progetto." },
     { icon: "📂", label: "Loadable Families", desc: "File .rfa: alberi, arredi, profili. Le carichi da libreria." },
     { icon: "✏️", label: "In-place Families", desc: "Geometrie uniche nel progetto. Nel Landscape: drainage che segue le pendenze, elementi custom." },
   ]},
-  { id: 8, section: "base", title: "Famiglie — Parte 2", topics: ["Tipo vs Istanza", "Parametri"], objective: "Distinguere parametri di tipo e di istanza.", docsUrl: DOCS+"type%20instance%20properties", diagram: null, steps: [
+  { id: 8, section: "base", title: "Famiglie — Parte 2", topics: ["Tipo vs Istanza", "Parametri"], objective: "Distinguere parametri di tipo e di istanza.", docsUrl: DOCS+"type%20instance%20properties", videoQuery: "Revit type instance parameters", diagram: null, steps: [
     { icon: "📋", label: "Type vs Instance", desc: "TYPE cambia tutte le copie (es. spessore paving). INSTANCE cambia solo l'elemento selezionato (es. quota di un singolo floor)." },
     { icon: "⚙️", label: "Edit Type", desc: "Properties → Edit Type. Duplica SEMPRE prima di modificare — regola d'oro." },
   ]},
-  { id: 9, section: "base", title: "Famiglie — Parte 3", topics: ["Family Editor", "Reference planes", "Extrusion"], objective: "Creare una famiglia da zero — preparazione per i profili Landscape.", docsUrl: DOCS+"family%20editor", diagram: null, steps: [
+  { id: 9, section: "base", title: "Famiglie — Parte 3", topics: ["Family Editor", "Reference planes", "Extrusion"], objective: "Creare una famiglia da zero — preparazione per i profili Landscape.", docsUrl: DOCS+"family%20editor", videoQuery: "Revit family editor create family", diagram: null, steps: [
     { icon: "📁", label: "Family Editor", desc: "File → New → Family → scegli template (es. Generic Model.rft)." },
     { icon: "✚", label: "Reference Planes", desc: "Create → Datum → Reference Plane: lo scheletro della geometria." },
     { icon: "📦", label: "Extrusion", desc: "Create → Forms → Extrusion: profilo 2D + profondità = solido." },
     { icon: "💾", label: "Load into Project", desc: "Create → Load into Project." },
   ]},
-  { id: 10, section: "base", title: "Stairs & Railing", topics: ["Stair by component", "Run", "Railing host"], objective: "Scale e ringhiere — elementi ricorrenti nel paesaggio.", docsUrl: DOCS+"stairs%20railings", diagram: null, steps: [
+  { id: 10, section: "base", title: "Stairs & Railing", topics: ["Stair by component", "Run", "Railing host"], objective: "Scale e ringhiere — elementi ricorrenti nel paesaggio.", docsUrl: DOCS+"stairs%20railings", videoQuery: "Revit stairs railing tutorial", diagram: null, steps: [
     { icon: "🪜", label: "Stair Tool", desc: "Architecture → Circulation → Stair. Run per le rampe, landing automatici. Due opzioni: sketch da zero o tipo standard esistente." },
     { icon: "🔧", label: "Railing", desc: "Architecture → Circulation → Railing. Su host (scale) o su sketch path libero." },
   ]},
-  { id: 11, section: "base", title: "Visibility & Graphics", topics: ["VG overrides (VV)", "Filtri", "View templates"], objective: "Controllare la grafica — essenziale per i piani landscape complessi.", docsUrl: DOCS+"visibility%20graphics", diagram: null, steps: [
+  { id: 11, section: "base", title: "Visibility & Graphics", topics: ["VG overrides (VV)", "Filtri", "View templates"], objective: "Controllare la grafica — essenziale per i piani landscape complessi.", docsUrl: DOCS+"visibility%20graphics", videoQuery: "Revit visibility graphics overrides", diagram: null, steps: [
     { icon: "👁️", label: "Apri VG", desc: "Shortcut VV. Override per categoria, visibilità worksets." },
     { icon: "🔍", label: "Filtri", desc: "Regole su parametri — es. colora di verde tutto il Soft Landscape." },
     { icon: "📋", label: "View Template", desc: "Salva impostazioni per riusarle: General Arrangement, Grading Plan, Planting Plan." },
   ]},
-  { id: 12, section: "base", title: "Viste e Sezioni", topics: ["Floor plans", "Sezioni", "3D views", "Duplicate"], objective: "Creare le viste per la documentazione landscape.", docsUrl: DOCS+"views%20sections", diagram: null, steps: [
+  { id: 12, section: "base", title: "Viste e Sezioni", topics: ["Floor plans", "Sezioni", "3D views", "Duplicate"], objective: "Creare le viste per la documentazione landscape.", docsUrl: DOCS+"views%20sections", videoQuery: "Revit views sections tutorial", diagram: null, steps: [
     { icon: "📐", label: "Floor Plan", desc: "View → Plan Views → Floor Plan. Nel landscape: GA, Grading, Hard/Soft Landscape per livello." },
     { icon: "✂️", label: "Section", desc: "View → Section. Site-wide e di dettaglio." },
     { icon: "📦", label: "Vista 3D", desc: "Default 3D View. Usa 2 viste affiancate (pianta+3D) quando lavori sul terreno." },
   ]},
-  { id: 13, section: "base", title: "Sheets", topics: ["Titleblock", "Viewport", "Output"], objective: "Comporre le tavole di progetto.", docsUrl: DOCS+"sheets%20titleblock", diagram: null, steps: [
+  { id: 13, section: "base", title: "Sheets", topics: ["Titleblock", "Viewport", "Output"], objective: "Comporre le tavole di progetto.", docsUrl: DOCS+"sheets%20titleblock", videoQuery: "Revit sheets titleblock tutorial", diagram: null, steps: [
     { icon: "📄", label: "Nuovo Sheet", desc: "View → Sheet. Trascina le viste dal Project Browser." },
     { icon: "📋", label: "Titleblock", desc: "Doppio clic per compilare numero, titolo, revisione." },
   ]},
-  { id: 14, section: "landscape", title: "BIM for Landscape", topics: ["Vantaggi e sfide", "Nessun tool nativo", "EIR e scala progetto"], objective: "Capire il contesto: in Revit il Landscape si fa piegando i tool architettonici.", docsUrl: DOCS+"site%20design", diagram: null, steps: [
+  { id: 14, section: "landscape", title: "BIM for Landscape", topics: ["Vantaggi e sfide", "Nessun tool nativo", "EIR e scala progetto"], objective: "Capire il contesto: in Revit il Landscape si fa piegando i tool architettonici.", docsUrl: DOCS+"site%20design", videoQuery: "Revit landscape architecture BIM site design", diagram: null, steps: [
     { icon: "💡", label: "Il principio chiave", desc: "Revit NON ha tool nativi per il Landscape. Userai Floor per il paving, Wall per i muri di contenimento, Sweep per drainage e cordoli. Questa è la mentalità da adottare." },
     { icon: "✅", label: "Vantaggi", desc: "Collaborazione integrata, schedule e budget aggiornati automaticamente al cambiare del design, quantità reali (scavi, riporti, aree), analisi rapida di scenari, approccio lean con meno sprechi." },
     { icon: "⚠️", label: "Sfide", desc: "Toposurface a triangoli (non contorni), nessuna interazione topo-paving, molti consulenti ancora in 2D, interoperabilità software, frustrazione iniziale degli utenti — si supera con buona strategia di modellazione e training." },
     { icon: "📋", label: "Cosa determina il modello", desc: "Scala, uso, location, design e fase del progetto — ma soprattutto ciò che è contrattualmente concordato col cliente e scritto nell'EIR." },
   ]},
-  { id: 15, section: "landscape", title: "Worksets & Collaborazione", topics: ["Central model", "Naming standard", "Divisione tipica"], objective: "Impostare la collaborazione multi-utente con worksets ben organizzati.", docsUrl: DOCS+"worksets", diagram: null, steps: [
+  { id: 15, section: "landscape", title: "Worksets & Collaborazione", topics: ["Central model", "Naming standard", "Divisione tipica"], objective: "Impostare la collaborazione multi-utente con worksets ben organizzati.", docsUrl: DOCS+"worksets", videoQuery: "Revit worksets worksharing tutorial", diagram: null, steps: [
     { icon: "🤝", label: "Central model", desc: "Dal primo giorno lavorerai in un modello centrale condiviso, accessibile da più utenti contemporaneamente. I worksets sono la chiave della collaborazione." },
     { icon: "🏷️", label: "Naming convention", desc: "Field 1: Zona (opzionale — progetti grandi divisi orizzontalmente o verticalmente). Field 2: Contenuto. Naming coerente e logico, secondo standard aziendali e ISO." },
     { icon: "📂", label: "Worksets Site", desc: "S-01_Components, S-02_Existing_Topography, S-03_Proposed_Topography, S-04_Existing_Planting, S-05_Entourage, S-06_Masses." },
     { icon: "🧱", label: "Worksets Hard Landscape", desc: "HL-01_Paving, HL-02_Stairs_Ramps_Railings, HL-03_Walls_Fences, HL-04_Furniture." },
     { icon: "🌳", label: "Worksets Soft Landscape", desc: "SL-01_Trees, SL-02_Planting, SL-03_Shrubs. Questa divisione è importante nelle fasi successive per sheets e visualizzazioni." },
   ]},
-  { id: 16, section: "landscape", title: "Viste per il Landscape", topics: ["General Arrangement", "Grading Plan", "Hard/Soft Landscape"], objective: "Creare il set di viste base di un progetto landscape.", docsUrl: DOCS+"view%20templates", diagram: null, steps: [
+  { id: 16, section: "landscape", title: "Viste per il Landscape", topics: ["General Arrangement", "Grading Plan", "Hard/Soft Landscape"], objective: "Creare il set di viste base di un progetto landscape.", docsUrl: DOCS+"view%20templates", videoQuery: "Revit view templates site plan", diagram: null, steps: [
     { icon: "📐", label: "Floorplans per livello", desc: "General Arrangement, Grading and Levels, Hard Landscape and Furniture, Soft Landscape." },
     { icon: "📦", label: "Viste 3D", desc: "Site View, Tree and Planting views, Hardscape, Softscape." },
     { icon: "⬆️", label: "Prospetti e Sezioni", desc: "Site-wide elevations/sections + detail elevations/sections." },
     { icon: "📋", label: "View Templates", desc: "Crea un view template per ogni tipo di vista così le impostazioni grafiche sono coerenti su tutto il progetto." },
   ]},
-  { id: 17, section: "landscape", title: "Paving — Floor Tool", topics: ["Floor come pavimentazione", "Duplicare tipi", "Strati"], objective: "Creare pavimentazioni esterne usando il Floor tool.", docsUrl: DOCS+"floors", diagram: "paving", steps: [
+  { id: 17, section: "landscape", title: "Paving — Floor Tool", topics: ["Floor come pavimentazione", "Duplicare tipi", "Strati"], objective: "Creare pavimentazioni esterne usando il Floor tool.", docsUrl: DOCS+"floors", videoQuery: "Revit floor paving landscape tutorial", diagram: "paving", steps: [
     { icon: "🧱", label: "Il concetto", desc: "Il paving è l'elemento hard landscape più comune. Si modella con il Floor tool: fa da host per famiglie, top face alla quota del livello, shape editabile, si raccorda ai floor architettonici." },
     { icon: "📋", label: "Nuovo tipo paving", desc: "Duplica un floor esistente → rinomina (es. Paving_Granito_60mm) → Edit Structure → cambia le proprietà." },
     { icon: "📚", label: "Aggiungi strati", desc: "Aggiungi tutti i layer necessari a descrivere il materiale: sub-base, allettamento, finitura. Ogni strato con il suo materiale e spessore." },
     { icon: "🌱", label: "Anche suolo e prato", desc: "Stesso metodo per terreno e prato: floor con strati come per un pavimento architettonico — l'unica differenza sono gli hatch appropriati." },
   ]},
-  { id: 18, section: "landscape", title: "Filled Patterns 2D", topics: ["Model vs Drafting", "Surface pattern", "Filled regions"], objective: "Rappresentare correttamente il paving nelle piante 2D.", docsUrl: DOCS+"fill%20patterns", diagram: null, steps: [
+  { id: 18, section: "landscape", title: "Filled Patterns 2D", topics: ["Model vs Drafting", "Surface pattern", "Filled regions"], objective: "Rappresentare correttamente il paving nelle piante 2D.", docsUrl: DOCS+"fill%20patterns", videoQuery: "Revit fill patterns model drafting", diagram: null, steps: [
     { icon: "🔲", label: "Due tipi di pattern", desc: "Gli 'hatch' in Revit sono Filled Patterns (file PAT). MODEL: dimensione reale fissa, si adatta alla scala — perfetto per lastre, blocchi, tiles ma illeggibile a scale grandi. DRAFTING: dimensione costante a ogni scala — sempre leggibile ma non a misura reale." },
     { icon: "🎨", label: "Applicali nel materiale", desc: "Floor editor → colonna Material → Material Editor → duplica o crea il materiale → definisci Surface pattern e Cut pattern." },
     { icon: "📐", label: "Oppure Filled Region", desc: "Come material property il pattern è un elemento di modello; come filled region è specifico della vista. Nessuna soluzione giusta o sbagliata — dipende dal progetto, puoi anche combinarli per il tuo Hard Landscape Plan." },
   ]},
-  { id: 19, section: "landscape", title: "Grading & Levels", topics: ["Modify sub-elements", "Add point", "Split lines", "Pendenze"], objective: "Dare pendenze e quote al paving — nel Landscape niente è piatto.", docsUrl: DOCS+"modify%20sub%20elements%20floor", diagram: "grading", steps: [
+  { id: 19, section: "landscape", title: "Grading & Levels", topics: ["Modify sub-elements", "Add point", "Split lines", "Pendenze"], objective: "Dare pendenze e quote al paving — nel Landscape niente è piatto.", docsUrl: DOCS+"modify%20sub%20elements%20floor", videoQuery: "Revit floor grading modify sub elements slope", diagram: "grading", steps: [
     { icon: "💡", label: "Perché serve", desc: "A differenza dell'architettura, il paving esterno è raramente piatto: servono falde e pendenze per il drenaggio e per raccordarsi alle quote esistenti. Seleziona il floor → nel ribbon appaiono i tool di shape editing." },
     { icon: "🟩", label: "Dividi in pattern regolari", desc: "Dividi il paving in moduli regolari (es. quadrati) per controllare facilmente i cambi di quota ed evitare il warning: 'Thickness of this Floor may be slightly inaccurate due to extreme Shape Editing'." },
     { icon: "✏️", label: "Edit Boundary", desc: "Modifica la forma del floor. ATTENZIONE: se cancelli/aggiungi segmenti su un floor già shaped, le quote tornano a 0. Sposta le linee senza cancellarle. Usa le dynamic dimensions cliccando sul valore." },
@@ -191,7 +193,7 @@ const CURRICULUM = [
     { icon: "📏", label: "Add Split Lines", desc: "Crea creste e valli. Genera automaticamente punto iniziale e finale a cui dare le quote. Anche qui le detail lines aiutano a posizionare con precisione." },
     { icon: "🔄", label: "Reset Shape", desc: "Riporta il floor piatto rimuovendo tutte le modifiche." },
   ]},
-  { id: 20, section: "landscape", title: "Drainage", topics: ["Famiglie floor-based", "Model in-place", "Sweep su path"], objective: "Modellare canalette e sistemi di drenaggio che seguono le pendenze.", docsUrl: DOCS+"sweep", diagram: "drainage", steps: [
+  { id: 20, section: "landscape", title: "Drainage", topics: ["Famiglie floor-based", "Model in-place", "Sweep su path"], objective: "Modellare canalette e sistemi di drenaggio che seguono le pendenze.", docsUrl: DOCS+"sweep", videoQuery: "Revit landscape drainage sweep model in place", diagram: "drainage", steps: [
     { icon: "💡", label: "Il problema", desc: "Non esiste un tool drainage in Revit. Griglie e caditoie = famiglie floor-based (seguono la pendenza). Canalette continue lungo le pendenze = model in-place con sweep." },
     { icon: "📦", label: "Via 1 — Famiglia floor-based", desc: "Carica famiglie dal tab Systems o dalle librerie: applicate al floor ne seguono la pendenza. REGOLA: devono essere floor-based, altrimenti NON seguiranno la pendenza." },
     { icon: "✏️", label: "Via 2 — Model In-Place", desc: "Architecture → Component → Model In-Place. Scegli una categoria appropriata per le schedules future: Specialty Equipment o Plumbing Fixture. Nomina il componente descrivendo elemento e dimensione." },
@@ -199,21 +201,21 @@ const CURRICULUM = [
     { icon: "📐", label: "Profilo", desc: "Due opzioni: sketcha il profilo direttamente, oppure seleziona un Metric Profile caricato. Usa la barra con assi x/y per posizionarlo, una sezione per le distanze esatte, poi spunta verde." },
     { icon: "🔄", label: "Aggiornamento automatico", desc: "Se il floor cambia quota o pendenza: seleziona l'elemento → l'elemento si aggiorna in accordo col floor senza ridisegnare path o profilo. Poi chiudi l'editor in-place." },
   ]},
-  { id: 21, section: "landscape", title: "Creare un Profile", topics: ["Metric Profile family", "Profilo chiuso", "Load"], objective: "Creare profili custom per drainage, kerbs e copping stones.", docsUrl: DOCS+"profile%20family", diagram: null, steps: [
+  { id: 21, section: "landscape", title: "Creare un Profile", topics: ["Metric Profile family", "Profilo chiuso", "Load"], objective: "Creare profili custom per drainage, kerbs e copping stones.", docsUrl: DOCS+"profile%20family", videoQuery: "Revit profile family tutorial", diagram: null, steps: [
     { icon: "📁", label: "Nuova famiglia", desc: "File → New → Family → seleziona il template Metric Profile." },
     { icon: "✏️", label: "Disegna il profilo", desc: "Nel template 2D disegna con semplici linee. REGOLA: il profilo deve essere CHIUSO." },
     { icon: "💾", label: "Salva e carica", desc: "Salva nella cartella profili del progetto → Load into Project. Ora è selezionabile quando usi Sweep, Slab Edge e Wall Sweep." },
   ]},
-  { id: 22, section: "landscape", title: "Kerbs (Cordoli)", topics: ["Sloped vs flat", "Slab Edge tool"], objective: "Creare cordoli in pendenza e piani.", docsUrl: DOCS+"slab%20edge", diagram: null, steps: [
+  { id: 22, section: "landscape", title: "Kerbs (Cordoli)", topics: ["Sloped vs flat", "Slab Edge tool"], objective: "Creare cordoli in pendenza e piani.", docsUrl: DOCS+"slab%20edge", videoQuery: "Revit slab edge kerb curb", diagram: null, steps: [
     { icon: "🔀", label: "Due strade", desc: "Cordolo IN PENDENZA → stesso processo del drainage (sweep model in-place su path). Cordolo PIANO → Slab Edge tool, più rapido." },
     { icon: "📋", label: "Slab Edge", desc: "Duplica la famiglia → rinomina in modo descrittivo → seleziona il profilo dalla lista → applica il materiale con surface e cut pattern → OK → clicca il bordo della slab." },
     { icon: "📐", label: "Posizionamento", desc: "Seleziona lo slab edge e premi invio → nel Properties a sinistra trovi i constraints per posizionarlo correttamente. Il punto di inserimento dipende da come hai disegnato il profilo nella famiglia." },
   ]},
-  { id: 23, section: "landscape", title: "Ramps nel Landscape", topics: ["Floor sloped vs Ramp tool"], objective: "Creare rampe esterne con il metodo più pratico.", docsUrl: DOCS+"ramps", diagram: null, steps: [
+  { id: 23, section: "landscape", title: "Ramps nel Landscape", topics: ["Floor sloped vs Ramp tool"], objective: "Creare rampe esterne con il metodo più pratico.", docsUrl: DOCS+"ramps", videoQuery: "Revit sloped floor ramp landscape", diagram: null, steps: [
     { icon: "⚠️", label: "Il Ramp tool è ostico", desc: "Revit ha un tool Ramp dedicato sotto Architecture ma è macchinoso da usare e gestire." },
     { icon: "✅", label: "Usa i Floor", desc: "Consiglio pratico: usa floor in pendenza (Modify Sub-elements, come nel Grading). Più facile da creare, modificare e raccordare al paving circostante." },
   ]},
-  { id: 24, section: "landscape", title: "Railings & Fences", topics: ["Sketch path", "Host", "Handrails", "Template"], objective: "Modellare ringhiere e recinzioni — uno degli elementi più complessi.", docsUrl: DOCS+"railings", diagram: null, steps: [
+  { id: 24, section: "landscape", title: "Railings & Fences", topics: ["Sketch path", "Host", "Handrails", "Template"], objective: "Modellare ringhiere e recinzioni — uno degli elementi più complessi.", docsUrl: DOCS+"railings", videoQuery: "Revit railing fence tutorial", diagram: null, steps: [
     { icon: "⚠️", label: "Premessa onesta", desc: "Le railing sono tra gli elementi più complessi di Revit, difficili da far funzionare come vuoi. Parti da template e famiglie esistenti di recinzioni e cancelli quando possibile." },
     { icon: "✏️", label: "Sketch Path", desc: "Architecture → Railing → Sketch Path. Se la vista non è adatta, Revit ti chiede di sceglierne una. Pick New Host per agganciare a floor, rampa o scala. Attiva Preview per vedere la geometria mentre sketchi." },
     { icon: "🪜", label: "Su scale", desc: "La railing va sketchata lungo la linea interna dello stringer per agganciarsi e inclinarsi correttamente. Su component-based stairs scegli posizionamento su Treads o Stringer." },
@@ -221,33 +223,33 @@ const CURRICULUM = [
     { icon: "🔄", label: "Posizione", desc: "Flip Railing Direction (doppia freccia) per invertire lato. Tread/Stringer offset per la regolazione fine: default 1/2 Stringer Width sugli stringer, 1 pollice sui treads." },
     { icon: "🌐", label: "Free-standing", desc: "Le railing possono anche essere libere su un livello, o agganciate a slab edge, wall top, roof, topografia. Rails e balusters si piazzano automaticamente a intervalli regolari, definiti dai profili caricati." },
   ]},
-  { id: 25, section: "landscape", title: "Retaining & Planter Walls", topics: ["Wall structure", "Sweeps", "Copping stone", "Foundation"], objective: "Muri di contenimento e fioriere con coronamenti e fondazioni.", docsUrl: DOCS+"wall%20sweeps", diagram: null, steps: [
+  { id: 25, section: "landscape", title: "Retaining & Planter Walls", topics: ["Wall structure", "Sweeps", "Copping stone", "Foundation"], objective: "Muri di contenimento e fioriere con coronamenti e fondazioni.", docsUrl: DOCS+"wall%20sweeps", videoQuery: "Revit retaining wall sweep coping", diagram: null, steps: [
     { icon: "🧱", label: "Usi nel Landscape", desc: "I muri nel paesaggio sono soprattutto: retaining walls (contenimento), planter walls (fioriere), balaustre. Sono system families di cui personalizzi composizione e spessore." },
     { icon: "📋", label: "Modifica struttura", desc: "Duplica SEMPRE la famiglia prima di modificare → Edit Structure → Insert per aggiungere layer → frecce su/giù per posizionarli → assegna i materiali." },
     { icon: "👑", label: "Copping stone con Sweep", desc: "Tipico nel landscape: coronamento e fondazione del retaining wall. Il modo più rapido: Wall Sweep. Aggiungi il profilo (o creane uno — vedi lezione Profile) → applica il materiale per dettagliarlo → usa i parametri e gli offset per posizionarlo in alto (copping) o in basso (foundation)." },
     { icon: "📏", label: "Reveal", desc: "Usa i Reveal per creare pattern e scanalature diverse sulla superficie del muro." },
   ]},
-  { id: 26, section: "landscape", title: "Toposurface", topics: ["Place points", "Create from import", "TIN da Civil 3D"], objective: "Creare la topografia — l'elemento più ostico di Revit.", docsUrl: DOCS+"toposurface", diagram: "topo", steps: [
+  { id: 26, section: "landscape", title: "Toposurface", topics: ["Place points", "Create from import", "TIN da Civil 3D"], objective: "Creare la topografia — l'elemento più ostico di Revit.", docsUrl: DOCS+"toposurface", videoQuery: "Revit toposurface tutorial site", diagram: "topo", steps: [
     { icon: "⚠️", label: "Limiti da conoscere", desc: "La toposurface non si comporta come gli altri elementi: un solo materiale che si estende all'infinito (niente strati né profondità), poche famiglie ospitabili (perlopiù entourage), niente vuoti, niente tool per specchi d'acqua, nessuna interazione con l'hard landscape, triangoli e non contorni." },
     { icon: "📍", label: "Metodo 1 — Place Points", desc: "Massing & Site → Toposurface → Place Points: digita la quota e piazza manualmente. Tedioso su progetti grandi, ok per aree piccole. Usa 2 viste (pianta + 3D) per vedere la profondità dei punti." },
     { icon: "📂", label: "Metodo 2 — Import DWG", desc: "Create from Import → Select Import Instance: Revit crea la toposurface dai punti del DWG (da AutoCAD o Civil 3D). Seleziona solo i layer con la geometria appropriata. È il metodo più comune." },
     { icon: "📄", label: "Metodo 3 — Point file", desc: "Da file Excel/TXT con coordinate. Metodo poco usato." },
     { icon: "⭐", label: "Best practice — TIN", desc: "Revit triangola i punti più vicini, quindi dai contorni il risultato è spesso impreciso. Chiedi al civil engineer (o al survey) di esportare una TIN surface da Civil 3D in DWG: selezioni i vertici come punti e il risultato è molto più accurato." },
   ]},
-  { id: 27, section: "landscape", title: "Split Surface", topics: ["Dividere toposurface", "Landform", "Percorsi"], objective: "Dividere la topografia per disegnare percorsi e landform.", docsUrl: DOCS+"split%20surface", diagram: null, steps: [
+  { id: 27, section: "landscape", title: "Split Surface", topics: ["Dividere toposurface", "Landform", "Percorsi"], objective: "Dividere la topografia per disegnare percorsi e landform.", docsUrl: DOCS+"split%20surface", videoQuery: "Revit split surface topography", diagram: null, steps: [
     { icon: "✂️", label: "Cosa fa", desc: "Divide la toposurface in due (massimo due superfici per volta). Visto che non ci sono tool di disegno per il terreno, Split è il modo per 'disegnare' percorsi, terrain e landform." },
     { icon: "📂", label: "Con DWG di guida", desc: "L'ideale: importa un DWG con landform/percorsi già disegnati e seleziona le linee. In alternativa usa detail lines come guida per il pick." },
     { icon: "✅", label: "Regione chiusa", desc: "Lo sketch deve formare una regione correttamente chiusa, altrimenti Revit non ti lascia uscire dall'editing mode." },
     { icon: "👁️", label: "Due viste sempre", desc: "Lavora con pianta + 3D affiancate per verificare il risultato. Lo split non modifica le quote anche con pendenze diverse — divide solo le superfici per fartele gestire. Applica il materiale prima di terminare l'editing." },
   ]},
-  { id: 28, section: "landscape", title: "Net / Cut / Fill", topics: ["Graded Region", "Volumi di scavo e riporto"], objective: "Calcolare scavi e riporti del landform — dato fondamentale di progetto.", docsUrl: DOCS+"graded%20region", diagram: "cutfill", steps: [
+  { id: 28, section: "landscape", title: "Net / Cut / Fill", topics: ["Graded Region", "Volumi di scavo e riporto"], objective: "Calcolare scavi e riporti del landform — dato fondamentale di progetto.", docsUrl: DOCS+"graded%20region", videoQuery: "Revit graded region cut fill toposurface", diagram: "cutfill", steps: [
     { icon: "💡", label: "Il task", desc: "Una delle richieste più comuni nel landscape: il calcolo Net/Cut/Fill del landform progettato. Si ottiene con il Graded Region tool." },
     { icon: "✂️", label: "Prima: Split", desc: "Dividi la superficie come nella lezione precedente per isolare l'area di intervento." },
     { icon: "📋", label: "Graded Region", desc: "Clicca Graded Region → si apre una finestra: scegli la PRIMA opzione, 'Create a new toposurface exactly like the existing one' (copia punti interni e perimetrali). Revit crea una superficie sopra quella esistente su cui puoi piazzare punti." },
     { icon: "📍", label: "Piazza i punti", desc: "Metti i punti DENTRO la boundary del tuo landform o area. La nuova superficie creata fornirà il valore Net/Cut/Fill necessario." },
     { icon: "📊", label: "Leggi i valori", desc: "Seleziona l'elemento creato → nel Properties trovi i dati Net/Cut/Fill in m³. La superficie resta sempre editabile; se la cancelli, il terreno torna alla forma originale." },
   ]},
-  { id: 29, section: "landscape", title: "Progetto Finale Landscape", topics: ["Piazza urbana completa", "Dal terreno alle tavole"], objective: "Applicare tutto: un piccolo spazio pubblico end-to-end.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/", diagram: null, steps: [
+  { id: 29, section: "landscape", title: "Progetto Finale Landscape", topics: ["Piazza urbana completa", "Dal terreno alle tavole"], objective: "Applicare tutto: un piccolo spazio pubblico end-to-end.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/", videoQuery: "Revit landscape site project tutorial", diagram: null, steps: [
     { icon: "📋", label: "Brief", desc: "Piccola piazza urbana: paving in pendenza, canaletta di drenaggio, cordoli, muro di contenimento con copping stone, rampa, ringhiera, terreno con landform." },
     { icon: "🌍", label: "Fase 1 — Terreno", desc: "Crea la toposurface, split per l'area pavimentata, calcola il cut/fill del landform con Graded Region." },
     { icon: "🧱", label: "Fase 2 — Hard Landscape", desc: "Paving con grading e pendenze, drainage sweep sul bordo, kerbs, retaining wall con copping stone, rampa con floor sloped, railing." },
@@ -257,105 +259,105 @@ const CURRICULUM = [
 
 // ── Curriculum EN ─────────────────────────────────────────────
 const CURRICULUM_EN = [
-  { id: 1, section: "base", title: "User Interface", topics: ["Ribbon", "Properties panel", "Project Browser", "Plan Views", "3D navigation"], objective: "Navigate Revit and find the main controls.", docsUrl: DOCS+"user%20interface", diagram: "ui", steps: [
+  { id: 1, section: "base", title: "User Interface", topics: ["Ribbon", "Properties panel", "Project Browser", "Plan Views", "3D navigation"], objective: "Navigate Revit and find the main controls.", docsUrl: DOCS+"user%20interface", videoQuery: "Revit user interface tutorial beginner", diagram: "ui", steps: [
     { icon: "🖥️", label: "Open Revit", desc: "Start Revit with a new project, Architectural template." },
     { icon: "📌", label: "Explore the Ribbon", desc: "Click Architecture, Massing & Site, Annotate, View and watch the panels change. Massing & Site will be your key tab for topography." },
     { icon: "📋", label: "Properties Panel", desc: "Top left: properties of the selected element or current view. Get into the habit of always checking it." },
     { icon: "🗂️", label: "Project Browser", desc: "Bottom left: all views, sheets, families in the project." },
     { icon: "🔍", label: "Drawing area", desc: "Wheel to zoom, hold middle button to pan, Shift+middle for 3D orbit." },
   ]},
-  { id: 2, section: "base", title: "BIM Concepts", topics: ["BIM vs CAD", "Levels", "Grids", "Data in the model"], objective: "Understand the BIM logic: every element carries real information.", docsUrl: DOCS+"levels%20grids", diagram: null, steps: [
+  { id: 2, section: "base", title: "BIM Concepts", topics: ["BIM vs CAD", "Levels", "Grids", "Data in the model"], objective: "Understand the BIM logic: every element carries real information.", docsUrl: DOCS+"levels%20grids", videoQuery: "Revit levels grids BIM basics", diagram: null, steps: [
     { icon: "💡", label: "BIM vs CAD", desc: "In CAD you draw lines. In Revit every element has data: material, cost, volume. In Landscape this means cut/fill quantities, paving areas, plant counts." },
     { icon: "📏", label: "Levels", desc: "Architecture → Datum → Level. In Landscape, levels define the site reference elevations." },
     { icon: "⊞", label: "Grids", desc: "Architecture → Datum → Grid. Reference axes, useful in large-scale landscape projects." },
   ]},
-  { id: 3, section: "base", title: "Wall", topics: ["System families", "Compound walls", "Edit structure"], objective: "Create and modify walls — the basis for retaining and planter walls.", docsUrl: DOCS+"walls", diagram: null, steps: [
+  { id: 3, section: "base", title: "Wall", topics: ["System families", "Compound walls", "Edit structure"], objective: "Create and modify walls — the basis for retaining and planter walls.", docsUrl: DOCS+"walls", videoQuery: "Revit wall tool tutorial", diagram: null, steps: [
     { icon: "🧱", label: "Wall Tool", desc: "Architecture → Build → Wall: Architectural." },
     { icon: "📐", label: "Choose type", desc: "Properties panel → wall type. Always duplicate before modifying." },
     { icon: "✏️", label: "Draw", desc: "Two clicks in the drawing area. ESC to exit." },
     { icon: "⚙️", label: "Edit Structure", desc: "Edit Type → Edit Structure: add layers and materials. Same process you'll use for retaining walls." },
   ]},
-  { id: 4, section: "base", title: "Floor", topics: ["Compound floors", "Sketch mode", "Boundary"], objective: "The Floor is THE Landscape tool: it becomes paving, grading, ramps.", docsUrl: DOCS+"floors", diagram: "floor", steps: [
+  { id: 4, section: "base", title: "Floor", topics: ["Compound floors", "Sketch mode", "Boundary"], objective: "The Floor is THE Landscape tool: it becomes paving, grading, ramps.", docsUrl: DOCS+"floors", videoQuery: "Revit floor tool tutorial", diagram: "floor", steps: [
     { icon: "⬛", label: "Floor Tool", desc: "Architecture → Build → Floor: Architectural. You enter Sketch Mode." },
     { icon: "✏️", label: "Sketch Boundary", desc: "Draw a closed perimeter with Boundary Lines." },
     { icon: "✅", label: "Finish", desc: "Green checkmark to complete. Open boundary = error." },
     { icon: "📐", label: "Edit Structure", desc: "Edit Type → Edit Structure: floor layers. In Landscape this is where you'll define sub-base, bedding and paving finish." },
   ]},
-  { id: 5, section: "base", title: "Component & Column", topics: ["Loadable components", "Site components", "Load Family"], objective: "Insert components — street furniture, trees, equipment.", docsUrl: DOCS+"components", diagram: null, steps: [
+  { id: 5, section: "base", title: "Component & Column", topics: ["Loadable components", "Site components", "Load Family"], objective: "Insert components — street furniture, trees, equipment.", docsUrl: DOCS+"components", videoQuery: "Revit component placement tutorial", diagram: null, steps: [
     { icon: "🪑", label: "Component Tool", desc: "Architecture → Build → Component. In Landscape: benches, bins, trees, lighting." },
     { icon: "📦", label: "Load Family", desc: "Insert → Load Family from libraries. Massing & Site → Site Component for site elements." },
   ]},
-  { id: 6, section: "base", title: "Materials", topics: ["Material browser", "Surface pattern", "Cut pattern"], objective: "Create materials — essential for paving and external finishes.", docsUrl: DOCS+"materials", diagram: null, steps: [
+  { id: 6, section: "base", title: "Materials", topics: ["Material browser", "Surface pattern", "Cut pattern"], objective: "Create materials — essential for paving and external finishes.", docsUrl: DOCS+"materials", videoQuery: "Revit materials tutorial", diagram: null, steps: [
     { icon: "🎨", label: "Material Browser", desc: "Manage → Materials. Here you'll create paving, gravel, grass, asphalt materials." },
     { icon: "➕", label: "Create material", desc: "Click + → rename (e.g. 'Paving_Granite_600x600')." },
     { icon: "🖼️", label: "Surface Pattern", desc: "Graphics tab → Surface Pattern: how it looks in plan. For paving it's the slab pattern." },
     { icon: "✂️", label: "Cut Pattern", desc: "Graphics tab → Cut Pattern: the hatch when the element is sectioned." },
   ]},
-  { id: 7, section: "base", title: "Families — Part 1", topics: ["System vs Loadable vs In-place", "Parametric logic"], objective: "Understand families — Landscape uses in-place and profiles heavily.", docsUrl: DOCS+"families", diagram: null, steps: [
+  { id: 7, section: "base", title: "Families — Part 1", topics: ["System vs Loadable vs In-place", "Parametric logic"], objective: "Understand families — Landscape uses in-place and profiles heavily.", docsUrl: DOCS+"families", videoQuery: "Revit families explained system loadable", diagram: null, steps: [
     { icon: "📦", label: "What they are", desc: "Every element is a Family. Floors and Walls are system; trees and furniture are loadable; custom drainage will be in-place." },
     { icon: "🧱", label: "System Families", desc: "Walls, floors, toposurface. They exist only inside the project." },
     { icon: "📂", label: "Loadable Families", desc: ".rfa files: trees, furniture, profiles. Loaded from libraries." },
     { icon: "✏️", label: "In-place Families", desc: "Unique geometry in the project. In Landscape: drainage that follows slopes, custom elements." },
   ]},
-  { id: 8, section: "base", title: "Families — Part 2", topics: ["Type vs Instance", "Parameters"], objective: "Distinguish type and instance parameters.", docsUrl: DOCS+"type%20instance%20properties", diagram: null, steps: [
+  { id: 8, section: "base", title: "Families — Part 2", topics: ["Type vs Instance", "Parameters"], objective: "Distinguish type and instance parameters.", docsUrl: DOCS+"type%20instance%20properties", videoQuery: "Revit type instance parameters", diagram: null, steps: [
     { icon: "📋", label: "Type vs Instance", desc: "TYPE changes all copies (e.g. paving thickness). INSTANCE changes only the selected element (e.g. one floor's elevation)." },
     { icon: "⚙️", label: "Edit Type", desc: "Properties → Edit Type. ALWAYS duplicate before modifying — golden rule." },
   ]},
-  { id: 9, section: "base", title: "Families — Part 3", topics: ["Family Editor", "Reference planes", "Extrusion"], objective: "Create a family from scratch — preparation for Landscape profiles.", docsUrl: DOCS+"family%20editor", diagram: null, steps: [
+  { id: 9, section: "base", title: "Families — Part 3", topics: ["Family Editor", "Reference planes", "Extrusion"], objective: "Create a family from scratch — preparation for Landscape profiles.", docsUrl: DOCS+"family%20editor", videoQuery: "Revit family editor create family", diagram: null, steps: [
     { icon: "📁", label: "Family Editor", desc: "File → New → Family → choose template (e.g. Generic Model.rft)." },
     { icon: "✚", label: "Reference Planes", desc: "Create → Datum → Reference Plane: the geometry skeleton." },
     { icon: "📦", label: "Extrusion", desc: "Create → Forms → Extrusion: 2D profile + depth = solid." },
     { icon: "💾", label: "Load into Project", desc: "Create → Load into Project." },
   ]},
-  { id: 10, section: "base", title: "Stairs & Railing", topics: ["Stair by component", "Run", "Railing host"], objective: "Stairs and railings — recurring landscape elements.", docsUrl: DOCS+"stairs%20railings", diagram: null, steps: [
+  { id: 10, section: "base", title: "Stairs & Railing", topics: ["Stair by component", "Run", "Railing host"], objective: "Stairs and railings — recurring landscape elements.", docsUrl: DOCS+"stairs%20railings", videoQuery: "Revit stairs railing tutorial", diagram: null, steps: [
     { icon: "🪜", label: "Stair Tool", desc: "Architecture → Circulation → Stair. Run for flights, automatic landings. Two options: sketch from scratch or use a standard type." },
     { icon: "🔧", label: "Railing", desc: "Architecture → Circulation → Railing. On a host (stairs) or free sketch path." },
   ]},
-  { id: 11, section: "base", title: "Visibility & Graphics", topics: ["VG overrides (VV)", "Filters", "View templates"], objective: "Control view graphics — essential for complex landscape plans.", docsUrl: DOCS+"visibility%20graphics", diagram: null, steps: [
+  { id: 11, section: "base", title: "Visibility & Graphics", topics: ["VG overrides (VV)", "Filters", "View templates"], objective: "Control view graphics — essential for complex landscape plans.", docsUrl: DOCS+"visibility%20graphics", videoQuery: "Revit visibility graphics overrides", diagram: null, steps: [
     { icon: "👁️", label: "Open VG", desc: "Shortcut VV. Category overrides, workset visibility." },
     { icon: "🔍", label: "Filters", desc: "Parameter-based rules — e.g. colour all Soft Landscape green." },
     { icon: "📋", label: "View Template", desc: "Save settings for reuse: General Arrangement, Grading Plan, Planting Plan." },
   ]},
-  { id: 12, section: "base", title: "Views and Sections", topics: ["Floor plans", "Sections", "3D views", "Duplicate"], objective: "Create the views for landscape documentation.", docsUrl: DOCS+"views%20sections", diagram: null, steps: [
+  { id: 12, section: "base", title: "Views and Sections", topics: ["Floor plans", "Sections", "3D views", "Duplicate"], objective: "Create the views for landscape documentation.", docsUrl: DOCS+"views%20sections", videoQuery: "Revit views sections tutorial", diagram: null, steps: [
     { icon: "📐", label: "Floor Plan", desc: "View → Plan Views → Floor Plan. In landscape: GA, Grading, Hard/Soft Landscape per level." },
     { icon: "✂️", label: "Section", desc: "View → Section. Site-wide and detail." },
     { icon: "📦", label: "3D View", desc: "Default 3D View. Use 2 tiled views (plan+3D) when working on terrain." },
   ]},
-  { id: 13, section: "base", title: "Sheets", topics: ["Titleblock", "Viewport", "Output"], objective: "Compose project sheets.", docsUrl: DOCS+"sheets%20titleblock", diagram: null, steps: [
+  { id: 13, section: "base", title: "Sheets", topics: ["Titleblock", "Viewport", "Output"], objective: "Compose project sheets.", docsUrl: DOCS+"sheets%20titleblock", videoQuery: "Revit sheets titleblock tutorial", diagram: null, steps: [
     { icon: "📄", label: "New Sheet", desc: "View → Sheet. Drag views from the Project Browser." },
     { icon: "📋", label: "Titleblock", desc: "Double-click to fill number, title, revision." },
   ]},
-  { id: 14, section: "landscape", title: "BIM for Landscape", topics: ["Advantages & challenges", "No native tools", "EIR and project scale"], objective: "Understand the context: Landscape in Revit means bending architectural tools.", docsUrl: DOCS+"site%20design", diagram: null, steps: [
+  { id: 14, section: "landscape", title: "BIM for Landscape", topics: ["Advantages & challenges", "No native tools", "EIR and project scale"], objective: "Understand the context: Landscape in Revit means bending architectural tools.", docsUrl: DOCS+"site%20design", videoQuery: "Revit landscape architecture BIM site design", diagram: null, steps: [
     { icon: "💡", label: "The key principle", desc: "Revit has NO native Landscape tools. You'll use Floor for paving, Wall for retaining walls, Sweep for drainage and kerbs. This is the mindset to adopt." },
     { icon: "✅", label: "Advantages", desc: "Integrated collaboration, schedules and budgets updated automatically as the design changes, real quantities (cut/fill, paving areas), rapid scenario analysis, lean approach with less waste." },
     { icon: "⚠️", label: "Challenges", desc: "Toposurface built on triangles (not contours), no topo-paving interaction, many consultants still in 2D, software interoperability, initial user frustration — overcome with a good modelling strategy and training." },
     { icon: "📋", label: "What drives the model", desc: "Scale, use, location, design and project phase — but above all what is contractually agreed with the client and written in the EIR." },
   ]},
-  { id: 15, section: "landscape", title: "Worksets & Collaboration", topics: ["Central model", "Naming standard", "Typical division"], objective: "Set up multi-user collaboration with well-organised worksets.", docsUrl: DOCS+"worksets", diagram: null, steps: [
+  { id: 15, section: "landscape", title: "Worksets & Collaboration", topics: ["Central model", "Naming standard", "Typical division"], objective: "Set up multi-user collaboration with well-organised worksets.", docsUrl: DOCS+"worksets", videoQuery: "Revit worksets worksharing tutorial", diagram: null, steps: [
     { icon: "🤝", label: "Central model", desc: "From day one you'll work in a shared central model, accessed by several users simultaneously. Worksets are the key to collaboration." },
     { icon: "🏷️", label: "Naming convention", desc: "Field 1: Zone (optional — large projects split horizontally or vertically). Field 2: Content. Consistent, logical naming following company and ISO standards." },
     { icon: "📂", label: "Site worksets", desc: "S-01_Components, S-02_Existing_Topography, S-03_Proposed_Topography, S-04_Existing_Planting, S-05_Entourage, S-06_Masses." },
     { icon: "🧱", label: "Hard Landscape worksets", desc: "HL-01_Paving, HL-02_Stairs_Ramps_Railings, HL-03_Walls_Fences, HL-04_Furniture." },
     { icon: "🌳", label: "Soft Landscape worksets", desc: "SL-01_Trees, SL-02_Planting, SL-03_Shrubs. This division matters later for sheets and visualisation setups." },
   ]},
-  { id: 16, section: "landscape", title: "Landscape Views", topics: ["General Arrangement", "Grading Plan", "Hard/Soft Landscape"], objective: "Create the basic view set of a landscape project.", docsUrl: DOCS+"view%20templates", diagram: null, steps: [
+  { id: 16, section: "landscape", title: "Landscape Views", topics: ["General Arrangement", "Grading Plan", "Hard/Soft Landscape"], objective: "Create the basic view set of a landscape project.", docsUrl: DOCS+"view%20templates", videoQuery: "Revit view templates site plan", diagram: null, steps: [
     { icon: "📐", label: "Floorplans per level", desc: "General Arrangement, Grading and Levels, Hard Landscape and Furniture, Soft Landscape." },
     { icon: "📦", label: "3D views", desc: "Site View, Tree and Planting views, Hardscape, Softscape." },
     { icon: "⬆️", label: "Elevations and Sections", desc: "Site-wide elevations/sections + detail elevations/sections." },
     { icon: "📋", label: "View Templates", desc: "Create a view template per view type so graphics stay consistent across the project." },
   ]},
-  { id: 17, section: "landscape", title: "Paving — Floor Tool", topics: ["Floor as paving", "Duplicating types", "Layers"], objective: "Create external paving using the Floor tool.", docsUrl: DOCS+"floors", diagram: "paving", steps: [
+  { id: 17, section: "landscape", title: "Paving — Floor Tool", topics: ["Floor as paving", "Duplicating types", "Layers"], objective: "Create external paving using the Floor tool.", docsUrl: DOCS+"floors", videoQuery: "Revit floor paving landscape tutorial", diagram: "paving", steps: [
     { icon: "🧱", label: "The concept", desc: "Paving is the most common hard landscape element. Model it with the Floor tool: hosts families, top face at creation level, editable shape, matches architectural floors." },
     { icon: "📋", label: "New paving type", desc: "Duplicate an existing floor → rename (e.g. Paving_Granite_60mm) → Edit Structure → change properties." },
     { icon: "📚", label: "Add layers", desc: "Add as many layers as needed to describe your paving material: sub-base, bedding, finish. Each with its material and thickness." },
     { icon: "🌱", label: "Soil and grass too", desc: "Same method for soil and grass: a floor with layers just like an architectural floor — the only difference is applying the proper hatches." },
   ]},
-  { id: 18, section: "landscape", title: "2D Filled Patterns", topics: ["Model vs Drafting", "Surface pattern", "Filled regions"], objective: "Represent paving correctly in 2D plans.", docsUrl: DOCS+"fill%20patterns", diagram: null, steps: [
+  { id: 18, section: "landscape", title: "2D Filled Patterns", topics: ["Model vs Drafting", "Surface pattern", "Filled regions"], objective: "Represent paving correctly in 2D plans.", docsUrl: DOCS+"fill%20patterns", videoQuery: "Revit fill patterns model drafting", diagram: null, steps: [
     { icon: "🔲", label: "Two pattern types", desc: "Revit 'hatches' are Filled Patterns (PAT files). MODEL: fixed real size, adjusts with view scale — perfect for slabs, blocks, tiles but unreadable at large/small scales. DRAFTING: constant size at any scale — always readable but not true-size." },
     { icon: "🎨", label: "Apply in the material", desc: "Floor editor → Material column → Material Editor → duplicate or create the material → define Surface and Cut patterns." },
     { icon: "📐", label: "Or Filled Region", desc: "As a material property the pattern is a model element; as a filled region it's view-specific. No right or wrong — depends on project needs, you can even combine both for your Hard Landscape Plan." },
   ]},
-  { id: 19, section: "landscape", title: "Grading & Levels", topics: ["Modify sub-elements", "Add point", "Split lines", "Slopes"], objective: "Give slopes and levels to paving — nothing is flat in Landscape.", docsUrl: DOCS+"modify%20sub%20elements%20floor", diagram: "grading", steps: [
+  { id: 19, section: "landscape", title: "Grading & Levels", topics: ["Modify sub-elements", "Add point", "Split lines", "Slopes"], objective: "Give slopes and levels to paving — nothing is flat in Landscape.", docsUrl: DOCS+"modify%20sub%20elements%20floor", videoQuery: "Revit floor grading modify sub elements slope", diagram: "grading", steps: [
     { icon: "💡", label: "Why it matters", desc: "Unlike architecture, external paving is rarely flat: falls and slopes are needed for drainage and to match existing levels. Select the floor → the shape editing tools appear in the ribbon." },
     { icon: "🟩", label: "Divide into regular patterns", desc: "Divide paving into regular modules (e.g. squares) to control level changes easily and avoid the warning: 'Thickness of this Floor may be slightly inaccurate due to extreme Shape Editing'." },
     { icon: "✏️", label: "Edit Boundary", desc: "Modifies the floor shape. WARNING: deleting/adding segments on an already-shaped floor resets elevations to 0. Move lines without deleting. Use dynamic dimensions by clicking the value." },
@@ -364,7 +366,7 @@ const CURRICULUM_EN = [
     { icon: "📏", label: "Add Split Lines", desc: "Create ridges and valleys. Automatically generates start and end points to assign levels to. Detail lines help place them precisely here too." },
     { icon: "🔄", label: "Reset Shape", desc: "Returns the floor to flat, removing all modifications." },
   ]},
-  { id: 20, section: "landscape", title: "Drainage", topics: ["Floor-based families", "Model in-place", "Sweep on path"], objective: "Model channels and drainage systems that follow slopes.", docsUrl: DOCS+"sweep", diagram: "drainage", steps: [
+  { id: 20, section: "landscape", title: "Drainage", topics: ["Floor-based families", "Model in-place", "Sweep on path"], objective: "Model channels and drainage systems that follow slopes.", docsUrl: DOCS+"sweep", videoQuery: "Revit landscape drainage sweep model in place", diagram: "drainage", steps: [
     { icon: "💡", label: "The problem", desc: "There is no drainage tool in Revit. Gratings and gullies = floor-based families (follow the slope). Continuous channels along slopes = model in-place with sweep." },
     { icon: "📦", label: "Way 1 — Floor-based family", desc: "Load families from the Systems tab or libraries: applied to the floor they follow its slope. RULE: they must be floor-based, otherwise they will NOT follow the slope." },
     { icon: "✏️", label: "Way 2 — Model In-Place", desc: "Architecture → Component → Model In-Place. Choose an appropriate category for future schedules: Specialty Equipment or Plumbing Fixture. Name the component describing element and size." },
@@ -372,21 +374,21 @@ const CURRICULUM_EN = [
     { icon: "📐", label: "Profile", desc: "Two options: sketch the profile directly, or select a loaded Metric Profile. Use the x/y axis bar to place it, a section view for exact distances, then green checkmark." },
     { icon: "🔄", label: "Automatic update", desc: "If the floor changes level or slope: select the element → it updates according to the floor without redrawing path or profile. Then close the in-place editor." },
   ]},
-  { id: 21, section: "landscape", title: "Creating a Profile", topics: ["Metric Profile family", "Closed profile", "Load"], objective: "Create custom profiles for drainage, kerbs and copping stones.", docsUrl: DOCS+"profile%20family", diagram: null, steps: [
+  { id: 21, section: "landscape", title: "Creating a Profile", topics: ["Metric Profile family", "Closed profile", "Load"], objective: "Create custom profiles for drainage, kerbs and copping stones.", docsUrl: DOCS+"profile%20family", videoQuery: "Revit profile family tutorial", diagram: null, steps: [
     { icon: "📁", label: "New family", desc: "File → New → Family → select the Metric Profile template." },
     { icon: "✏️", label: "Draw the profile", desc: "In the 2D standard template draw with simple lines. RULE: the profile must be CLOSED." },
     { icon: "💾", label: "Save and load", desc: "Save in the project profiles folder → Load into Project. Now selectable when using Sweep, Slab Edge and Wall Sweep." },
   ]},
-  { id: 22, section: "landscape", title: "Kerbs (Curbs)", topics: ["Sloped vs flat", "Slab Edge tool"], objective: "Create sloped and flat kerbs.", docsUrl: DOCS+"slab%20edge", diagram: null, steps: [
+  { id: 22, section: "landscape", title: "Kerbs (Curbs)", topics: ["Sloped vs flat", "Slab Edge tool"], objective: "Create sloped and flat kerbs.", docsUrl: DOCS+"slab%20edge", videoQuery: "Revit slab edge kerb curb", diagram: null, steps: [
     { icon: "🔀", label: "Two ways", desc: "SLOPED kerb → same process as drainage (model in-place sweep on path). FLAT kerb → Slab Edge tool, faster." },
     { icon: "📋", label: "Slab Edge", desc: "Duplicate the family → rename descriptively → pick the profile from the list → apply material with surface and cut patterns → OK → click the slab edge to apply." },
     { icon: "📐", label: "Placement", desc: "Select the slab edge and press enter → constraints in the Properties panel help you position it correctly. The insertion point depends on how the profile was drawn in the Metric Profile family." },
   ]},
-  { id: 23, section: "landscape", title: "Ramps in Landscape", topics: ["Sloped floor vs Ramp tool"], objective: "Create external ramps the practical way.", docsUrl: DOCS+"ramps", diagram: null, steps: [
+  { id: 23, section: "landscape", title: "Ramps in Landscape", topics: ["Sloped floor vs Ramp tool"], objective: "Create external ramps the practical way.", docsUrl: DOCS+"ramps", videoQuery: "Revit sloped floor ramp landscape", diagram: null, steps: [
     { icon: "⚠️", label: "The Ramp tool is tricky", desc: "Revit has a dedicated Ramp tool under Architecture but it's awkward to use and manage." },
     { icon: "✅", label: "Use Floors", desc: "Practical advice: use sloped floors (Modify Sub-elements, as in Grading). Easier to create, modify and match to surrounding paving." },
   ]},
-  { id: 24, section: "landscape", title: "Railings & Fences", topics: ["Sketch path", "Host", "Handrails", "Template"], objective: "Model railings and fences — one of the most complex elements.", docsUrl: DOCS+"railings", diagram: null, steps: [
+  { id: 24, section: "landscape", title: "Railings & Fences", topics: ["Sketch path", "Host", "Handrails", "Template"], objective: "Model railings and fences — one of the most complex elements.", docsUrl: DOCS+"railings", videoQuery: "Revit railing fence tutorial", diagram: null, steps: [
     { icon: "⚠️", label: "Honest premise", desc: "Railings are among Revit's most complex elements, hard to make behave as you want. Start from existing templates and fence/gate families when possible." },
     { icon: "✏️", label: "Sketch Path", desc: "Architecture → Railing → Sketch Path. If the view isn't suitable, Revit asks you to pick one. Pick New Host to attach to floor, ramp or stair. Enable Preview to see the geometry while sketching." },
     { icon: "🪜", label: "On stairs", desc: "The railing must be sketched along the inside line of the stair stringer to host and slope correctly. On component-based stairs choose placement on Treads or Stringer." },
@@ -394,33 +396,33 @@ const CURRICULUM_EN = [
     { icon: "🔄", label: "Position", desc: "Flip Railing Direction (double arrow) to switch side. Tread/Stringer offset for fine adjustment: default 1/2 Stringer Width on stringers, 1 inch on treads." },
     { icon: "🌐", label: "Free-standing", desc: "Railings can also be free-standing on a level, or attached to slab edges, wall tops, roofs, topography. Rails and balusters are placed automatically at even intervals, shapes defined by the loaded profile families." },
   ]},
-  { id: 25, section: "landscape", title: "Retaining & Planter Walls", topics: ["Wall structure", "Sweeps", "Copping stone", "Foundation"], objective: "Retaining walls and planters with coping and foundations.", docsUrl: DOCS+"wall%20sweeps", diagram: null, steps: [
+  { id: 25, section: "landscape", title: "Retaining & Planter Walls", topics: ["Wall structure", "Sweeps", "Copping stone", "Foundation"], objective: "Retaining walls and planters with coping and foundations.", docsUrl: DOCS+"wall%20sweeps", videoQuery: "Revit retaining wall sweep coping", diagram: null, steps: [
     { icon: "🧱", label: "Landscape uses", desc: "Walls in landscape are mostly: retaining walls, planter walls, balustrades. They are system families whose composition and thickness you customise." },
     { icon: "📋", label: "Modify structure", desc: "ALWAYS duplicate the family before modifying → Edit Structure → Insert to add layers → up/down arrows to position them → assign materials." },
     { icon: "👑", label: "Copping stone with Sweep", desc: "Typical in landscape: coping and foundation slab on the retaining wall. Fastest way: Wall Sweep. Add the profile (or create one — see Profile lesson) → apply the material to detail it → use parameters and offsets to place it top (coping) or bottom (foundation)." },
     { icon: "📏", label: "Reveal", desc: "Use Reveals to create different patterns and grooves on the wall surface." },
   ]},
-  { id: 26, section: "landscape", title: "Toposurface", topics: ["Place points", "Create from import", "TIN from Civil 3D"], objective: "Create topography — Revit's most challenging element.", docsUrl: DOCS+"toposurface", diagram: "topo", steps: [
+  { id: 26, section: "landscape", title: "Toposurface", topics: ["Place points", "Create from import", "TIN from Civil 3D"], objective: "Create topography — Revit's most challenging element.", docsUrl: DOCS+"toposurface", videoQuery: "Revit toposurface tutorial site", diagram: "topo", steps: [
     { icon: "⚠️", label: "Know the limits", desc: "The toposurface doesn't behave like other elements: one single material extending infinitely (no layers or depths), few hostable families (mostly entourage), no voids, no water body tools, no interaction with hard landscape, triangles not contours." },
     { icon: "📍", label: "Method 1 — Place Points", desc: "Massing & Site → Toposurface → Place Points: type the elevation and place manually. Tedious for big projects, fine for small areas. Use 2 views (plan + 3D) to see point depth." },
     { icon: "📂", label: "Method 2 — Import DWG", desc: "Create from Import → Select Import Instance: Revit creates the toposurface from the points of the DWG (from AutoCAD or Civil 3D). Select only the layers containing the appropriate geometry. The most common method." },
     { icon: "📄", label: "Method 3 — Point file", desc: "From an Excel/TXT coordinate file. Rarely used." },
     { icon: "⭐", label: "Best practice — TIN", desc: "Revit triangulates the closest points, so from contours the result is often inaccurate. Ask the civil engineer (or survey) to export a TIN surface from Civil 3D to DWG: pick the vertices as points and the result is far more accurate." },
   ]},
-  { id: 27, section: "landscape", title: "Split Surface", topics: ["Dividing toposurface", "Landform", "Paths"], objective: "Divide the topography to design paths and landforms.", docsUrl: DOCS+"split%20surface", diagram: null, steps: [
+  { id: 27, section: "landscape", title: "Split Surface", topics: ["Dividing toposurface", "Landform", "Paths"], objective: "Divide the topography to design paths and landforms.", docsUrl: DOCS+"split%20surface", videoQuery: "Revit split surface topography", diagram: null, steps: [
     { icon: "✂️", label: "What it does", desc: "Splits the toposurface in two (max two surfaces at a time). Since there are no terrain drawing tools, Split is how you 'design' paths, terrain and landforms." },
     { icon: "📂", label: "With a guide DWG", desc: "Best option: import a DWG with landforms/paths already drawn and pick the lines. Alternatively use detail lines as guides for picking." },
     { icon: "✅", label: "Closed region", desc: "The sketch must form a properly enclosed region or Revit won't let you finish editing mode." },
     { icon: "👁️", label: "Always two views", desc: "Work with plan + 3D tiled to check the result. Split doesn't change levels even with different slopes — it only divides surfaces so you can manage them. Apply the material before finishing the edit." },
   ]},
-  { id: 28, section: "landscape", title: "Net / Cut / Fill", topics: ["Graded Region", "Cut and fill volumes"], objective: "Calculate cut and fill of the designed landform — a key project figure.", docsUrl: DOCS+"graded%20region", diagram: "cutfill", steps: [
+  { id: 28, section: "landscape", title: "Net / Cut / Fill", topics: ["Graded Region", "Cut and fill volumes"], objective: "Calculate cut and fill of the designed landform — a key project figure.", docsUrl: DOCS+"graded%20region", videoQuery: "Revit graded region cut fill toposurface", diagram: "cutfill", steps: [
     { icon: "💡", label: "The task", desc: "One of the most common landscape requests: the Net/Cut/Fill of the designed landform. Achieved with the Graded Region tool." },
     { icon: "✂️", label: "First: Split", desc: "Split the surface as in the previous lesson to isolate the intervention area." },
     { icon: "📋", label: "Graded Region", desc: "Click Graded Region → a window opens: choose the FIRST option, 'Create a new toposurface exactly like the existing one' (both internal and perimeter points are copied). Revit creates a surface on top of the existing one where you can place points." },
     { icon: "📍", label: "Place the points", desc: "Place points INSIDE the boundary of your landform or area. The new surface created will provide the required Net/Cut/Fill value." },
     { icon: "📊", label: "Read the values", desc: "Select the created element → the Properties panel shows Net/Cut/Fill data in m³. The surface always stays editable; delete it and the terrain returns to its original form." },
   ]},
-  { id: 29, section: "landscape", title: "Final Landscape Project", topics: ["Complete urban plaza", "From terrain to sheets"], objective: "Apply everything: a small public space end-to-end.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/", diagram: null, steps: [
+  { id: 29, section: "landscape", title: "Final Landscape Project", topics: ["Complete urban plaza", "From terrain to sheets"], objective: "Apply everything: a small public space end-to-end.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/", videoQuery: "Revit landscape site project tutorial", diagram: null, steps: [
     { icon: "📋", label: "Brief", desc: "Small urban plaza: sloped paving, drainage channel, kerbs, retaining wall with copping stone, ramp, railing, terrain with landform." },
     { icon: "🌍", label: "Phase 1 — Terrain", desc: "Create the toposurface, split for the paved area, calculate the landform cut/fill with Graded Region." },
     { icon: "🧱", label: "Phase 2 — Hard Landscape", desc: "Paving with grading and slopes, drainage sweep on the edge, kerbs, retaining wall with copping stone, sloped-floor ramp, railing." },
@@ -942,6 +944,7 @@ export default function LandscapeTutor() {
           </div>
           <button onClick={() => setShowWelcome(true)} style={{ padding: "4px 9px", borderRadius: "5px", border: "1px solid #16241a", background: "transparent", color: "#4a5a50", cursor: "pointer", fontSize: "11px", flexShrink: 0 }}>?</button>
           <a href={lesson.docsUrl} target="_blank" rel="noopener noreferrer" style={{ padding: "4px 10px", borderRadius: "5px", border: "1px solid #16241a", background: "transparent", color: "#4a5a50", textDecoration: "none", fontSize: "11px", flexShrink: 0 }}>{t.docsBtn}</a>
+          <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(lesson.videoQuery || ("Revit " + lesson.title))}`} target="_blank" rel="noopener noreferrer" style={{ padding: "4px 10px", borderRadius: "5px", border: "1px solid #16241a", background: "transparent", color: "#4a5a50", textDecoration: "none", fontSize: "11px", flexShrink: 0 }}>{t.videoBtn}</a>
           <div style={{ display: "flex", gap: "5px", flexShrink: 0 }}>
             <button onClick={() => setCurrentLesson(i => Math.max(0, i - 1))} disabled={currentLesson === 0} style={{ padding: "4px 9px", borderRadius: "5px", border: "1px solid #16241a", background: "transparent", color: currentLesson === 0 ? "#16241a" : "#4a5a50", cursor: currentLesson === 0 ? "not-allowed" : "pointer", fontSize: "11px" }}>{t.prev}</button>
             <button onClick={() => setCurrentLesson(i => Math.min(curriculum.length - 1, i + 1))} disabled={currentLesson === curriculum.length - 1} style={{ padding: "4px 9px", borderRadius: "5px", border: "none", background: "linear-gradient(135deg, #22c55e, #0d9488)", color: "#04140a", cursor: "pointer", fontSize: "11px", fontWeight: "700" }}>{t.next}</button>
@@ -984,6 +987,9 @@ export default function LandscapeTutor() {
             ))}
             <a href={lesson.docsUrl} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 14px", background: "#0e150f", border: "1px solid #16241a", borderRadius: "8px", color: "#3a4a40", textDecoration: "none", fontSize: "12px", marginTop: "4px" }}>
               <span>📖</span><span>{t.officialDocs} — {lesson.title}</span><span style={{ marginLeft: "auto" }}>↗</span>
+            </a>
+            <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(lesson.videoQuery || ("Revit " + lesson.title))}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 14px", background: "#0e150f", border: "1px solid #16241a", borderRadius: "8px", color: "#3a4a40", textDecoration: "none", fontSize: "12px", marginTop: "4px" }}>
+              <span>🎥</span><span>{t.videoBtn} — YouTube</span><span style={{ marginLeft: "auto" }}>↗</span>
             </a>
           </div>
         )}
