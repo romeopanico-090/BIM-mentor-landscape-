@@ -1,595 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 
-const CURRICULUM = [
-  { id: 1, title: "User Interface", topics: ["Ribbon e schede principali", "Properties panel", "Project Browser", "Creare Plan Views", "Line Styles e Line Patterns", "Fill Patterns"], objective: "Orientarsi in Revit e capire dove si trovano i controlli principali.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=user%20interface", videoQuery: "Revit user interface tutorial beginner",
-    steps: [
-      { icon: "🖥️", label: "Apri Revit", desc: "Avvia Revit e apri un nuovo progetto con il template Architectural." },
-      { icon: "📌", label: "Esplora il Ribbon", desc: "In cima trovi il Ribbon: clicca su Architecture, Structure, Annotate, View e osserva i pannelli che cambiano." },
-      { icon: "📋", label: "Properties Panel", desc: "A sinistra in alto: mostra le proprietà dell'elemento selezionato. Se nulla è selezionato, mostra la vista corrente." },
-      { icon: "🗂️", label: "Project Browser", desc: "A sinistra in basso: elenca tutte le viste, sheets, famiglie e gruppi del progetto." },
-      { icon: "🔍", label: "Area di disegno", desc: "Al centro: qui disegni. Usa la rotella del mouse per zoom, tieni premuto il tasto centrale per pan." },
-    ],
-    diagram: "ui"
-  },
-  { id: 2, title: "Concetti BIM", topics: ["BIM vs CAD", "Livelli (Levels)", "Griglie (Grids)", "Discipline e viste"], objective: "Capire la logica BIM prima di modellare qualsiasi elemento.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=levels%20grids", videoQuery: "Revit levels grids BIM basics",
-    steps: [
-      { icon: "💡", label: "BIM vs CAD", desc: "In CAD disegni linee. In Revit costruisci un edificio 3D — ogni elemento ha dati reali: materiale, costo, area." },
-      { icon: "📏", label: "Levels", desc: "Architecture → Datum → Level. I livelli definiscono le quote dei piani. Ogni muro si aggancia a un livello." },
-      { icon: "⊞", label: "Grids", desc: "Architecture → Datum → Grid. Le griglie definiscono gli assi strutturali come riferimento." },
-    ],
-    diagram: "bim"
-  },
-  { id: 3, title: "Wall", topics: ["System families", "Compound walls", "Stacked walls", "Editare la struttura del muro"], objective: "Creare e modificare muri di diversi tipi e spessori.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=walls", videoQuery: "Revit wall tool tutorial",
-    steps: [
-      { icon: "🧱", label: "Wall Tool", desc: "Architecture → Build → Wall → Wall: Architectural." },
-      { icon: "📐", label: "Scegli il tipo", desc: "Properties panel: clicca il tipo di muro (es. Basic Wall 200mm) e cambialo dal menu." },
-      { icon: "✏️", label: "Disegna", desc: "Clicca due punti nell'area di disegno. Premi ESC per uscire dal tool." },
-      { icon: "⚙️", label: "Edit Structure", desc: "Seleziona il muro → Properties → Edit Type → Edit Structure per modificare strati." },
-    ],
-    diagram: "wall"
-  },
-  { id: 4, title: "Door & Window", topics: ["Inserire porte e finestre", "Modificare parametri", "Tag automatici", "Allineamento"], objective: "Inserire porte e finestre correttamente in un muro.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=doors%20windows", videoQuery: "Revit doors windows tutorial",
-    steps: [
-      { icon: "🚪", label: "Door Tool", desc: "Architecture → Build → Door. Avvicinati a un muro e clicca per inserire." },
-      { icon: "🪟", label: "Window Tool", desc: "Architecture → Build → Window. Clicca sul muro dove vuoi la finestra." },
-      { icon: "↔️", label: "Inverti orientamento", desc: "Dopo l'inserimento appaiono frecce blu: cliccale per invertire apertura." },
-      { icon: "🏷️", label: "Tag automatico", desc: "Annotate → Tag → Tag All per etichettare tutte le porte e finestre." },
-    ],
-    diagram: "door"
-  },
-  { id: 5, title: "Component & Column", topics: ["Loadable components", "Colonne architetturali", "Colonne strutturali"], objective: "Inserire componenti e colonne nel modello.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=components%20columns", videoQuery: "Revit component column placement",
-    steps: [
-      { icon: "🪑", label: "Component Tool", desc: "Architecture → Build → Component. Inserisce famiglie loadable come mobili e arredi." },
-      { icon: "🏛️", label: "Column Tool", desc: "Architecture → Build → Column: Architectural per colonne decorative." },
-      { icon: "📦", label: "Load Family", desc: "Se non disponibile, clicca Load Family nel ribbon per cercare nelle librerie." },
-    ],
-    diagram: null
-  },
-  { id: 6, title: "Floor", topics: ["Compound floors", "Boundary e sketch mode", "Floor slope", "Core boundary"], objective: "Creare pavimenti con struttura compound e gestire i bordi.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=floors", videoQuery: "Revit floor tool tutorial",
-    steps: [
-      { icon: "⬛", label: "Floor Tool", desc: "Architecture → Build → Floor: Architectural. Entri in Sketch Mode." },
-      { icon: "✏️", label: "Sketch Boundary", desc: "Disegna il perimetro chiuso con Boundary Line." },
-      { icon: "✅", label: "Finish Sketch", desc: "Clicca il segno di spunta verde (Finish Edit Mode)." },
-      { icon: "📐", label: "Edit Structure", desc: "Seleziona il floor → Edit Type → Edit Structure per aggiungere strati." },
-    ],
-    diagram: "floor"
-  },
-  { id: 7, title: "Ceiling", topics: ["Compound ceilings", "Gestione quota", "Pattern e griglia", "Automatic ceiling"], objective: "Creare soffitti e gestirne l'altezza e il pattern.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=ceilings", videoQuery: "Revit ceiling tutorial",
-    steps: [
-      { icon: "⬜", label: "Ceiling Tool", desc: "Architecture → Build → Ceiling. Usa Automatic Ceiling cliccando dentro un ambiente chiuso." },
-      { icon: "📏", label: "Imposta la quota", desc: "Properties panel: modifica Height Offset From Level." },
-      { icon: "🔲", label: "Cambia pattern", desc: "Edit Type → modifica il Compound Structure per materiale e pattern." },
-    ],
-    diagram: null
-  },
-  { id: 8, title: "Roof", topics: ["Roof by footprint", "Roof by extrusion", "Slope arrow", "Overhang e fascia"], objective: "Modellare tetti a falda e piani in modo corretto.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=roofs", videoQuery: "Revit roof tutorial",
-    steps: [
-      { icon: "🏠", label: "Roof by Footprint", desc: "Architecture → Build → Roof → Roof by Footprint." },
-      { icon: "📐", label: "Imposta slope", desc: "Seleziona ogni lato → Properties → attiva Defines Roof Slope e imposta l'angolo." },
-      { icon: "↔️", label: "Overhang", desc: "Properties: imposta Overhang per far sporgere il tetto." },
-      { icon: "🏗️", label: "Roof by Extrusion", desc: "Utile per tetti a botte: disegna il profilo in sezione e estrudi lungo un asse." },
-    ],
-    diagram: null
-  },
-  { id: 9, title: "Curtain Wall & Mullions", topics: ["Sistema curtain wall", "Curtain grid", "Pannelli", "Mullioni"], objective: "Creare facciate continue con griglie e montanti personalizzati.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=curtain%20walls", videoQuery: "Revit curtain wall mullions tutorial",
-    steps: [
-      { icon: "🏢", label: "Curtain Wall", desc: "Architecture → Build → Wall → scegli tipo Curtain Wall." },
-      { icon: "⊞", label: "Curtain Grid", desc: "Architecture → Build → Curtain Grid. Clicca sul muro per aggiungere griglie." },
-      { icon: "🔳", label: "Mullion", desc: "Architecture → Build → Mullion. Clicca sulle linee di griglia per i montanti." },
-      { icon: "🚪", label: "Sostituisci pannello", desc: "Seleziona pannello → Properties → cambia tipo (es. porta o pannello opaco)." },
-    ],
-    diagram: null
-  },
-  { id: 10, title: "Stairs & Railing", topics: ["Stair by component", "Run e landing", "Railing", "Custom baluster"], objective: "Modellare scale e corrimano con la geometria corretta.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=stairs%20railings", videoQuery: "Revit stairs railing tutorial",
-    steps: [
-      { icon: "🪜", label: "Stair Tool", desc: "Architecture → Circulation → Stair." },
-      { icon: "➡️", label: "Crea Run", desc: "Clicca Run e disegna la direzione. Revit conta i gradini automaticamente." },
-      { icon: "⬛", label: "Landing", desc: "Con più rampe, Revit crea il pianerottolo automaticamente." },
-      { icon: "🔧", label: "Railing", desc: "Architecture → Circulation → Railing. Aggancia a percorso o scala esistente." },
-    ],
-    diagram: null
-  },
-  { id: 11, title: "Opening", topics: ["Wall opening", "Shaft opening", "Vertical opening"], objective: "Creare aperture negli elementi del modello.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=openings", videoQuery: "Revit shaft opening tutorial",
-    steps: [
-      { icon: "🔲", label: "Wall Opening", desc: "Architecture → Opening → Wall Opening. Clicca il muro e disegna il rettangolo." },
-      { icon: "⬇️", label: "Shaft Opening", desc: "Architecture → Opening → Shaft. Taglia verticalmente attraverso più livelli." },
-      { icon: "⬜", label: "Vertical Opening", desc: "Architecture → Opening → Vertical. Taglia in un pavimento o tetto." },
-    ],
-    diagram: null
-  },
-  { id: 12, title: "Room & Area", topics: ["Room placement", "Room tag", "Area plan", "Color fill"], objective: "Definire e visualizzare ambienti e aree nel modello.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=rooms%20areas", videoQuery: "Revit rooms areas tutorial",
-    steps: [
-      { icon: "🏠", label: "Room Tool", desc: "Architecture → Room & Area → Room. Clicca dentro un ambiente chiuso." },
-      { icon: "🏷️", label: "Room Tag", desc: "Il tag appare automaticamente. Doppio clic per rinominare." },
-      { icon: "🗺️", label: "Area Plan", desc: "Architecture → Room & Area → Area Plan." },
-      { icon: "🎨", label: "Color Fill", desc: "Annotate → Color Fill → Color Fill Legend per colorare ambienti." },
-    ],
-    diagram: null
-  },
-  { id: 13, title: "Materiali", topics: ["Material browser", "Creare materiale", "Surface pattern", "Cut pattern", "Render appearance"], objective: "Creare materiali personalizzati e assegnarli agli elementi.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=materials", videoQuery: "Revit materials tutorial",
-    steps: [
-      { icon: "🎨", label: "Material Browser", desc: "Manage → Materials. Si apre il browser dei materiali." },
-      { icon: "➕", label: "Crea materiale", desc: "Clicca + in basso. Rinomina il materiale." },
-      { icon: "🖼️", label: "Surface Pattern", desc: "Tab Graphics → Surface Pattern: texture 2D in pianta/prospetto." },
-      { icon: "✂️", label: "Cut Pattern", desc: "Tab Graphics → Cut Pattern: retino di sezione." },
-    ],
-    diagram: null
-  },
-  { id: 14, title: "Famiglie — Parte 1", topics: ["Cos'è una famiglia", "System vs Loadable vs In-place", "Logica parametrica"], objective: "Capire la struttura delle famiglie dopo aver usato gli elementi reali.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=families", videoQuery: "Revit families explained system loadable",
-    steps: [
-      { icon: "📦", label: "Cosa sono", desc: "Ogni elemento in Revit è una Famiglia. Muri, porte, finestre — sono tutte famiglie." },
-      { icon: "🧱", label: "System Families", desc: "Non caricabili: muri, pavimenti, soffitti, tetti. Esistono solo nel progetto." },
-      { icon: "📂", label: "Loadable Families", desc: "File .rfa: porte, finestre, mobili. Puoi crearne di nuove." },
-      { icon: "✏️", label: "In-place Families", desc: "Geometrie uniche nel progetto. Solo per forme non standard." },
-    ],
-    diagram: "families"
-  },
-  { id: 15, title: "Famiglie — Parte 2", topics: ["Tipo vs Istanza", "Type parameters", "Instance parameters"], objective: "Distinguere e modificare parametri di tipo e di istanza.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=type%20instance%20properties", videoQuery: "Revit type instance parameters",
-    steps: [
-      { icon: "📋", label: "Type vs Instance", desc: "TYPE: cambia tutte le copie. INSTANCE: cambia solo l'elemento selezionato." },
-      { icon: "⚙️", label: "Edit Type", desc: "Properties → Edit Type. Modifica parametri che cambiano TUTTI gli elementi." },
-      { icon: "📐", label: "Instance Parameters", desc: "Properties senza Edit Type: cambiano solo l'elemento selezionato." },
-    ],
-    diagram: null
-  },
-  { id: 16, title: "Famiglie — Parte 3", topics: ["Family Editor", "Reference planes", "Extrusion", "Parametri dimensionali"], objective: "Creare una famiglia loadable semplice da zero.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=family%20editor", videoQuery: "Revit family editor create family",
-    steps: [
-      { icon: "📁", label: "Family Editor", desc: "File → New → Family. Scegli template (es. Generic Model.rft)." },
-      { icon: "✚", label: "Reference Planes", desc: "Create → Datum → Reference Plane. Base su cui si aggancia la geometria." },
-      { icon: "📦", label: "Extrusion", desc: "Create → Forms → Extrusion. Profilo 2D + profondità = solido 3D." },
-      { icon: "📏", label: "Parametri", desc: "Aggiungi quota → lucchetto → Label. La famiglia diventa parametrica." },
-      { icon: "💾", label: "Carica nel progetto", desc: "Create → Load into Project." },
-    ],
-    diagram: null
-  },
-  { id: 17, title: "Visibility & Graphics", topics: ["VG overrides", "Filtri", "View templates"], objective: "Controllare la grafica delle viste e creare view templates.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=visibility%20graphics", videoQuery: "Revit visibility graphics overrides",
-    steps: [
-      { icon: "👁️", label: "Apri VG", desc: "Shortcut: VV. Apre Visibility/Graphics per la vista corrente." },
-      { icon: "📂", label: "Override categorie", desc: "Model Categories: nascondi categorie o cambia colore/spessore linee." },
-      { icon: "🔍", label: "Filtri", desc: "Tab Filters: regole su parametri (es. mostra in rosso muri con Fire Rating 2h)." },
-      { icon: "📋", label: "View Template", desc: "View → View Templates → Create Template. Salva impostazioni riutilizzabili." },
-    ],
-    diagram: null
-  },
-  { id: 18, title: "Viste e Sezioni", topics: ["Piante di piano", "Prospetti", "Sezioni", "Callout", "Viste 3D"], objective: "Creare e gestire tutti i tipi di vista per la documentazione.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=views%20sections", videoQuery: "Revit views sections tutorial",
-    steps: [
-      { icon: "📐", label: "Floor Plan", desc: "View → Create → Plan Views → Floor Plan. Scegli il livello." },
-      { icon: "⬆️", label: "Elevation", desc: "View → Create → Elevation. Clicca per posizionare il simbolo." },
-      { icon: "✂️", label: "Section", desc: "View → Create → Section. Disegna la linea di taglio." },
-      { icon: "🔍", label: "Callout", desc: "View → Create → Callout. Rettangolo su una zona per dettaglio ingrandito." },
-      { icon: "📦", label: "Vista 3D", desc: "View → Create → 3D View → Default 3D View." },
-    ],
-    diagram: null
-  },
-  { id: 19, title: "Massing & Site", topics: ["Conceptual mass", "Model by face", "Toposurface", "Building pad"], objective: "Generare elementi architettonici da masse e modellare il sito.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=massing%20site", videoQuery: "Revit massing site toposurface",
-    steps: [
-      { icon: "🏗️", label: "Massing Tool", desc: "Massing & Site → Conceptual Mass → In-Place Mass." },
-      { icon: "🧱", label: "Model by Face", desc: "Seleziona massa → Model by Face: crea muri/pavimenti/tetti dalle facce." },
-      { icon: "🌍", label: "Toposurface", desc: "Massing & Site → Model Site → Toposurface. Clicca punti con quota." },
-      { icon: "⬛", label: "Building Pad", desc: "Massing & Site → Building Pad. Piattaforma piana che taglia il terreno." },
-    ],
-    diagram: null
-  },
-  { id: 20, title: "Design Options", topics: ["Option sets", "Varianti", "Confrontare opzioni"], objective: "Gestire varianti di progetto nello stesso file.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=design%20options", videoQuery: "Revit design options tutorial",
-    steps: [
-      { icon: "⚙️", label: "Design Options", desc: "Manage → Design Options. Crea Option Set con opzioni diverse." },
-      { icon: "✏️", label: "Modifica opzione", desc: "Seleziona opzione dal menu in basso → disegna elementi per quella variante." },
-      { icon: "👁️", label: "Confronta", desc: "In ogni vista puoi impostare quale opzione visualizzare." },
-      { icon: "✅", label: "Accetta", desc: "Manage → Design Options → Accept Primary." },
-    ],
-    diagram: null
-  },
-  { id: 21, title: "Schedules", topics: ["Room schedule", "Door/window schedule", "Formule", "Export Excel"], objective: "Creare abachi automatici estratti dal modello.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=schedules", videoQuery: "Revit schedules tutorial",
-    steps: [
-      { icon: "📊", label: "Crea Schedule", desc: "View → Create → Schedules → Schedule/Quantities. Scegli categoria." },
-      { icon: "➕", label: "Aggiungi campi", desc: "Tab Fields: aggiungi parametri (Width, Height, Mark, Level)." },
-      { icon: "🔽", label: "Filtra e ordina", desc: "Tab Filter + Sorting/Grouping: raggruppa per tipo o livello." },
-      { icon: "📤", label: "Export Excel", desc: "File → Export → Reports → Schedule → .txt → apri in Excel." },
-    ],
-    diagram: null
-  },
-  { id: 22, title: "Annotazioni", topics: ["Quote", "Testi", "Tag", "Spot elevation"], objective: "Annotare correttamente le viste per la documentazione.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=dimensions%20annotations", videoQuery: "Revit annotations dimensions tags",
-    steps: [
-      { icon: "📏", label: "Aligned Dimension", desc: "Annotate → Dimension → Aligned. Clicca elementi, poi clicca lontano per quota." },
-      { icon: "📝", label: "Text", desc: "Annotate → Text → Text. Clicca e scrivi." },
-      { icon: "🏷️", label: "Tag by Category", desc: "Annotate → Tag → Tag by Category. Clicca elemento per tag automatico." },
-      { icon: "📍", label: "Spot Elevation", desc: "Annotate → Dimension → Spot Elevation. Clicca pavimento per quota assoluta." },
-    ],
-    diagram: null
-  },
-  { id: 23, title: "Sheets", topics: ["Creare sheets", "Titleblock", "Viste sul foglio", "Revisioni"], objective: "Comporre e organizzare le tavole di progetto.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=sheets%20titleblock", videoQuery: "Revit sheets titleblock tutorial",
-    steps: [
-      { icon: "📄", label: "Nuovo Sheet", desc: "View → Sheet Composition → Sheet. Scegli titleblock." },
-      { icon: "🖼️", label: "Aggiungi viste", desc: "Dal Project Browser, trascina una vista sullo sheet." },
-      { icon: "📐", label: "Allinea viste", desc: "Seleziona viewport → Align (AL). Blocca con lucchetto." },
-      { icon: "📋", label: "Titleblock", desc: "Doppio clic sul titleblock per compilare numero tavola, titolo, data." },
-    ],
-    diagram: null
-  },
-  { id: 24, title: "Links", topics: ["Collegare modelli RVT", "Overlay vs Attachment", "CAD link"], objective: "Collegare modelli di discipline diverse.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=link%20models", videoQuery: "Revit link models CAD tutorial",
-    steps: [
-      { icon: "🔗", label: "Insert Link", desc: "Insert → Link Revit. Scegli il file .rvt da collegare." },
-      { icon: "⚙️", label: "Overlay vs Attachment", desc: "Overlay: non si propaga. Attachment: si propaga. Default: Overlay." },
-      { icon: "📋", label: "Manage Links", desc: "Insert → Manage Links. Ricarica, rimuovi o aggiorna link." },
-      { icon: "📂", label: "CAD Link", desc: "Insert → Link CAD. Collega DWG come riferimento senza incorporarlo." },
-    ],
-    diagram: null
-  },
-  { id: 25, title: "Manage & Coordinate", topics: ["Project base point", "Survey point", "Shared coordinates", "Copy/Monitor"], objective: "Gestire il sistema di coordinate tra modelli collegati.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=shared%20coordinates", videoQuery: "Revit manage coordinate copy monitor",
-    steps: [
-      { icon: "📍", label: "Project Base Point", desc: "Punto di riferimento interno. Cerchio con X in pianta." },
-      { icon: "🌍", label: "Survey Point", desc: "Punto geografico reale per coordinarsi con altri modelli." },
-      { icon: "🔄", label: "Shared Coordinates", desc: "Manage → Coordinates → Acquire/Publish Coordinates." },
-      { icon: "👁️", label: "Copy/Monitor", desc: "Collaborate → Copy/Monitor. Copia levels/grids dal modello linkato." },
-    ],
-    diagram: null
-  },
-  { id: 26, title: "Export", topics: ["DWG", "PDF", "IFC", "NWC Navisworks"], objective: "Esportare il modello nei formati richiesti.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=export%20dwg%20ifc", videoQuery: "Revit export DWG PDF IFC",
-    steps: [
-      { icon: "📤", label: "Export DWG", desc: "File → Export → CAD Formats → DWG. Configura layer mapping." },
-      { icon: "🖨️", label: "Export PDF", desc: "File → Export → PDF (Revit 2022+)." },
-      { icon: "🔄", label: "Export IFC", desc: "File → Export → IFC. Configura schema e mapping categorie." },
-      { icon: "🏗️", label: "Export NWC", desc: "File → Export → NWC per clash detection in Navisworks." },
-    ],
-    diagram: null
-  },
-  { id: 27, title: "Progetto Finale", topics: ["Edificio residenziale 2 piani", "Dalla massa alla documentazione", "Export"], objective: "Applicare tutto il curriculum su un progetto reale end-to-end.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/", videoQuery: "Revit beginner full project tutorial",
-    steps: [
-      { icon: "📋", label: "Brief", desc: "Edificio residenziale 2 livelli. PT: soggiorno, cucina, bagno. P1: 2 camere, bagno, terrazza." },
-      { icon: "🏗️", label: "Fase 1 — Struttura", desc: "Imposta Levels e Grids. Crea muri perimetrali e interni su entrambi i livelli." },
-      { icon: "🪟", label: "Fase 2 — Aperture", desc: "Inserisci porte, finestre, scala, pavimenti e tetto." },
-      { icon: "📄", label: "Fase 3 — Documentazione", desc: "Piante, prospetti, sezioni, quote, tag, sheets." },
-      { icon: "📤", label: "Fase 4 — Export", desc: "DWG, PDF e IFC." },
-    ],
-    diagram: null
-  }
-];
-
-// SVG Diagrams
-const DIAGRAMS = {
-  ui: (
-    <svg viewBox="0 0 560 340" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",maxWidth:"560px"}}>
-      <rect width="560" height="340" rx="8" fill="#ffffff"/>
-      {/* Ribbon */}
-      <rect x="8" y="8" width="544" height="52" rx="4" fill="#dbe7fc" stroke="#3d7ef5" strokeWidth="1.5"/>
-      <text x="18" y="24" fill="#3d7ef5" fontSize="9" fontWeight="700">FILE</text>
-      <rect x="50" y="12" width="70" height="20" rx="3" fill="#3d7ef5" opacity="0.3"/>
-      <text x="55" y="26" fill="#2563c9" fontSize="9" fontWeight="600">ARCHITECTURE</text>
-      <text x="130" y="26" fill="#7a8290" fontSize="9">STRUCTURE</text>
-      <text x="195" y="26" fill="#7a8290" fontSize="9">ANNOTATE</text>
-      <text x="255" y="26" fill="#7a8290" fontSize="9">VIEW</text>
-      <text x="295" y="26" fill="#7a8290" fontSize="9">MANAGE</text>
-      {/* Ribbon panels */}
-      <rect x="50" y="34" width="490" height="22" rx="2" fill="#eaf1fd"/>
-      <rect x="54" y="36" width="55" height="18" rx="2" fill="#eaf1fd"/>
-      <text x="66" y="48" fill="#2563c9" fontSize="8">🧱 Wall</text>
-      <rect x="114" y="36" width="50" height="18" rx="2" fill="#eaf1fd"/>
-      <text x="122" y="48" fill="#2563c9" fontSize="8">🚪 Door</text>
-      <rect x="169" y="36" width="55" height="18" rx="2" fill="#eaf1fd"/>
-      <text x="175" y="48" fill="#2563c9" fontSize="8">🪟 Window</text>
-      <rect x="229" y="36" width="45" height="18" rx="2" fill="#eaf1fd"/>
-      <text x="234" y="48" fill="#2563c9" fontSize="8">🏠 Roof</text>
-      <rect x="279" y="36" width="50" height="18" rx="2" fill="#eaf1fd"/>
-      <text x="283" y="48" fill="#2563c9" fontSize="8">🪜 Stairs</text>
-      {/* Label ribbon */}
-      <rect x="8" y="3" width="55" height="12" rx="3" fill="#3d7ef5"/>
-      <text x="13" y="12" fill="white" fontSize="8" fontWeight="700">① RIBBON</text>
-
-      {/* Properties */}
-      <rect x="8" y="66" width="130" height="120" rx="4" fill="#eef1f7" stroke="#9b4ff7" strokeWidth="1.5"/>
-      <rect x="8" y="66" width="130" height="16" rx="4" fill="#f1ebfb"/>
-      <text x="14" y="77" fill="#7c3aed" fontSize="8" fontWeight="700">Properties</text>
-      <text x="14" y="93" fill="#7a8290" fontSize="7">Type Selector</text>
-      <rect x="14" y="96" width="118" height="14" rx="2" fill="#dfe4ee"/>
-      <text x="18" y="106" fill="#5a6270" fontSize="7">Basic Wall: Generic 200mm</text>
-      <text x="14" y="120" fill="#7a8290" fontSize="7">Constraints</text>
-      <rect x="14" y="122" width="55" height="10" rx="1" fill="#dfe4ee"/>
-      <text x="16" y="130" fill="#6b7280" fontSize="6">Base Constraint</text>
-      <rect x="72" y="122" width="60" height="10" rx="1" fill="#dfe4ee"/>
-      <text x="74" y="130" fill="#5a6270" fontSize="6">Level 0</text>
-      <rect x="14" y="135" width="55" height="10" rx="1" fill="#dfe4ee"/>
-      <text x="16" y="143" fill="#6b7280" fontSize="6">Top Constraint</text>
-      <rect x="72" y="135" width="60" height="10" rx="1" fill="#dfe4ee"/>
-      <text x="74" y="143" fill="#5a6270" fontSize="6">Level 1</text>
-      <rect x="30" y="152" width="90" height="14" rx="3" fill="#3d7ef5" opacity="0.8"/>
-      <text x="50" y="162" fill="white" fontSize="7" fontWeight="600">Edit Type</text>
-      <rect x="8" y="61" width="90" height="12" rx="3" fill="#9b4ff7"/>
-      <text x="13" y="70" fill="white" fontSize="8" fontWeight="700">② PROPERTIES</text>
-
-      {/* Project Browser */}
-      <rect x="8" y="194" width="130" height="138" rx="4" fill="#eef1f7" stroke="#22c55e" strokeWidth="1.5"/>
-      <rect x="8" y="194" width="130" height="16" rx="4" fill="#e9f7ee"/>
-      <text x="14" y="205" fill="#16a34a" fontSize="8" fontWeight="700">Project Browser</text>
-      <text x="14" y="220" fill="#7a8290" fontSize="7">▼ Views (all)</text>
-      <text x="22" y="232" fill="#6b7280" fontSize="7">▼ Floor Plans</text>
-      <text x="30" y="243" fill="#5a6270" fontSize="7">Level 0</text>
-      <text x="30" y="253" fill="#5a6270" fontSize="7">Level 1</text>
-      <text x="30" y="263" fill="#5a6270" fontSize="7">Site</text>
-      <text x="22" y="274" fill="#6b7280" fontSize="7">▼ Elevations</text>
-      <text x="30" y="284" fill="#5a6270" fontSize="7">North</text>
-      <text x="30" y="294" fill="#5a6270" fontSize="7">South</text>
-      <text x="14" y="305" fill="#7a8290" fontSize="7">▼ Sheets</text>
-      <text x="14" y="316" fill="#7a8290" fontSize="7">▼ Families</text>
-      <rect x="8" y="189" width="100" height="12" rx="3" fill="#22c55e"/>
-      <text x="13" y="198" fill="white" fontSize="8" fontWeight="700">③ PROJECT BROWSER</text>
-
-      {/* Drawing area */}
-      <rect x="146" y="66" width="406" height="266" rx="4" fill="#f4f6fb" stroke="#e9edf5" strokeWidth="1"/>
-      {/* Grid lines */}
-      <line x1="200" y1="66" x2="200" y2="332" stroke="#dfe4ee" strokeWidth="0.5" strokeDasharray="4,4"/>
-      <line x1="300" y1="66" x2="300" y2="332" stroke="#dfe4ee" strokeWidth="0.5" strokeDasharray="4,4"/>
-      <line x1="400" y1="66" x2="400" y2="332" stroke="#dfe4ee" strokeWidth="0.5" strokeDasharray="4,4"/>
-      <line x1="146" y1="150" x2="552" y2="150" stroke="#dfe4ee" strokeWidth="0.5" strokeDasharray="4,4"/>
-      <line x1="146" y1="230" x2="552" y2="230" stroke="#dfe4ee" strokeWidth="0.5" strokeDasharray="4,4"/>
-      {/* Sample walls */}
-      <rect x="200" y="140" width="200" height="6" rx="1" fill="#3d7ef5" opacity="0.7"/>
-      <rect x="200" y="140" width="6" height="100" rx="1" fill="#3d7ef5" opacity="0.7"/>
-      <rect x="394" y="140" width="6" height="100" rx="1" fill="#3d7ef5" opacity="0.7"/>
-      <rect x="200" y="234" width="200" height="6" rx="1" fill="#3d7ef5" opacity="0.7"/>
-      <text x="270" y="200" fill="#3d7ef5" fontSize="11" opacity="0.4">AREA DI DISEGNO</text>
-      <rect x="146" y="61" width="90" height="12" rx="3" fill="#f59e0b"/>
-      <text x="151" y="70" fill="white" fontSize="8" fontWeight="700">④ AREA DI DISEGNO</text>
-
-      {/* View Control Bar */}
-      <rect x="146" y="320" width="406" height="12" rx="2" fill="#eef1f7" stroke="#dfe4ee" strokeWidth="1"/>
-      <text x="155" y="329" fill="#7a8290" fontSize="7">1:100  📐  ☀️  🎨  👁  🌐</text>
-      <rect x="146" y="315" width="80" height="10" rx="2" fill="#f59e0b" opacity="0.7"/>
-      <text x="150" y="323" fill="white" fontSize="6" fontWeight="700">⑤ VIEW CONTROL</text>
-    </svg>
-  ),
-
-  bim: (
-    <svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",maxWidth:"560px"}}>
-      <rect width="560" height="300" rx="8" fill="#ffffff"/>
-      {/* Title */}
-      <text x="20" y="28" fill="#1a1d28" fontSize="13" fontWeight="700">Livelli (Levels) e Griglie (Grids)</text>
-      {/* Building section */}
-      {/* Levels */}
-      <line x1="40" y1="80" x2="520" y2="80" stroke="#3d7ef5" strokeWidth="2" strokeDasharray="8,4"/>
-      <line x1="40" y1="155" x2="520" y2="155" stroke="#3d7ef5" strokeWidth="2" strokeDasharray="8,4"/>
-      <line x1="40" y1="230" x2="520" y2="230" stroke="#3d7ef5" strokeWidth="2" strokeDasharray="8,4"/>
-      {/* Level labels */}
-      <rect x="440" y="70" width="80" height="18" rx="3" fill="#dbe7fc" stroke="#3d7ef5" strokeWidth="1"/>
-      <text x="448" y="82" fill="#3d7ef5" fontSize="9" fontWeight="700">Level 2  +6.00</text>
-      <rect x="440" y="145" width="80" height="18" rx="3" fill="#dbe7fc" stroke="#3d7ef5" strokeWidth="1"/>
-      <text x="448" y="157" fill="#3d7ef5" fontSize="9" fontWeight="700">Level 1  +3.00</text>
-      <rect x="440" y="220" width="80" height="18" rx="3" fill="#dbe7fc" stroke="#3d7ef5" strokeWidth="1"/>
-      <text x="448" y="232" fill="#3d7ef5" fontSize="9" fontWeight="700">Level 0  ±0.00</text>
-      {/* Walls */}
-      <rect x="80" y="80" width="10" height="150" fill="#8a92a0"/>
-      <rect x="350" y="80" width="10" height="150" fill="#8a92a0"/>
-      <rect x="80" y="155" width="280" height="10" fill="#6b7280" opacity="0.5"/>
-      {/* Grid lines */}
-      <line x1="85" y1="50" x2="85" y2="250" stroke="#22c55e" strokeWidth="1.5" strokeDasharray="6,3"/>
-      <line x1="210" y1="50" x2="210" y2="250" stroke="#22c55e" strokeWidth="1.5" strokeDasharray="6,3"/>
-      <line x1="355" y1="50" x2="355" y2="250" stroke="#22c55e" strokeWidth="1.5" strokeDasharray="6,3"/>
-      {/* Grid labels */}
-      <circle cx="85" cy="48" r="10" fill="none" stroke="#22c55e" strokeWidth="1.5"/>
-      <text x="82" y="52" fill="#22c55e" fontSize="9" fontWeight="700">A</text>
-      <circle cx="210" cy="48" r="10" fill="none" stroke="#22c55e" strokeWidth="1.5"/>
-      <text x="207" y="52" fill="#22c55e" fontSize="9" fontWeight="700">B</text>
-      <circle cx="355" cy="48" r="10" fill="none" stroke="#22c55e" strokeWidth="1.5"/>
-      <text x="352" y="52" fill="#22c55e" fontSize="9" fontWeight="700">C</text>
-      {/* Legend */}
-      <line x1="40" y1="268" x2="70" y2="268" stroke="#3d7ef5" strokeWidth="2" strokeDasharray="8,4"/>
-      <text x="75" y="272" fill="#3d7ef5" fontSize="9">Levels — quota orizzontale di ogni piano</text>
-      <line x1="40" y1="285" x2="70" y2="285" stroke="#22c55e" strokeWidth="1.5" strokeDasharray="6,3"/>
-      <text x="75" y="289" fill="#22c55e" fontSize="9">Grids — assi di riferimento verticali</text>
-      {/* Muro label */}
-      <rect x="40" y="108" width="8" height="4" fill="#8a92a0"/>
-      <text x="52" y="115" fill="#5a6270" fontSize="8">Muro agganciato tra Level 0 e Level 2</text>
-    </svg>
-  ),
-
-  wall: (
-    <svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",maxWidth:"560px"}}>
-      <rect width="560" height="300" rx="8" fill="#ffffff"/>
-      <text x="20" y="28" fill="#1a1d28" fontSize="13" fontWeight="700">Wall Tool — dove cliccare</text>
-      {/* Ribbon mockup */}
-      <rect x="10" y="38" width="540" height="40" rx="4" fill="#dbe7fc" stroke="#3d7ef5" strokeWidth="1"/>
-      <text x="18" y="53" fill="#7a8290" fontSize="8">Architecture</text>
-      <rect x="60" y="42" width="55" height="32" rx="3" fill="#3d7ef5" opacity="0.2" stroke="#3d7ef5" strokeWidth="1.5"/>
-      <text x="68" y="55" fill="#2563c9" fontSize="7" fontWeight="700">Build</text>
-      <rect x="64" y="57" width="46" height="14" rx="2" fill="#3d7ef5"/>
-      <text x="75" y="67" fill="white" fontSize="8" fontWeight="700">🧱 Wall</text>
-      {/* Arrow */}
-      <path d="M87 75 L87 92" stroke="#3d7ef5" strokeWidth="2" markerEnd="url(#arrow)"/>
-      <defs><marker id="arrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#3d7ef5"/></marker></defs>
-
-      {/* Plan view */}
-      <rect x="10" y="95" width="330" height="190" rx="4" fill="#f4f6fb" stroke="#e9edf5" strokeWidth="1"/>
-      <text x="20" y="113" fill="#7a8290" fontSize="8">Pianta di piano — Area di disegno</text>
-      {/* Wall drawing sequence */}
-      <circle cx="80" cy="160" r="6" fill="#3d7ef5" stroke="#2563c9" strokeWidth="1.5"/>
-      <text x="72" y="178" fill="#3d7ef5" fontSize="8" fontWeight="700">1° click</text>
-      <rect x="80" y="154" width="180" height="12" rx="2" fill="#3d7ef5" opacity="0.8"/>
-      <circle cx="260" cy="160" r="6" fill="#9b4ff7" stroke="#7c3aed" strokeWidth="1.5"/>
-      <text x="250" y="178" fill="#9b4ff7" fontSize="8" fontWeight="700">2° click</text>
-      {/* Dimension */}
-      <line x1="80" y1="190" x2="260" y2="190" stroke="#f59e0b" strokeWidth="1" strokeDasharray="4,2"/>
-      <text x="145" y="202" fill="#f59e0b" fontSize="8">3600 mm</text>
-      {/* Properties mockup */}
-      <rect x="350" y="95" width="200" height="190" rx="4" fill="#eef1f7" stroke="#9b4ff7" strokeWidth="1.5"/>
-      <text x="360" y="113" fill="#7c3aed" fontSize="8" fontWeight="700">Properties</text>
-      <text x="360" y="128" fill="#7a8290" fontSize="7">Tipo muro:</text>
-      <rect x="360" y="130" width="180" height="16" rx="2" fill="#dfe4ee"/>
-      <text x="364" y="141" fill="#5a6270" fontSize="7">Basic Wall: Generic - 200mm</text>
-      <text x="360" y="158" fill="#7a8290" fontSize="7">Base Constraint:</text>
-      <rect x="360" y="160" width="180" height="14" rx="2" fill="#dfe4ee"/>
-      <text x="364" y="170" fill="#5a6270" fontSize="7">Level 0</text>
-      <text x="360" y="184" fill="#7a8290" fontSize="7">Top Constraint:</text>
-      <rect x="360" y="186" width="180" height="14" rx="2" fill="#dfe4ee"/>
-      <text x="364" y="196" fill="#5a6270" fontSize="7">Level 1</text>
-      <rect x="380" y="248" width="110" height="18" rx="3" fill="#3d7ef5"/>
-      <text x="408" y="261" fill="white" fontSize="8" fontWeight="700">Edit Type</text>
-      {/* Labels */}
-      <rect x="10" y="88" width="120" height="12" rx="3" fill="#3d7ef5"/>
-      <text x="15" y="97" fill="white" fontSize="8" fontWeight="700">① Seleziona Wall Tool</text>
-      <rect x="350" y="88" width="130" height="12" rx="3" fill="#9b4ff7"/>
-      <text x="355" y="97" fill="white" fontSize="8" fontWeight="700">② Imposta tipo nel Properties</text>
-    </svg>
-  ),
-
-  door: (
-    <svg viewBox="0 0 560 280" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",maxWidth:"560px"}}>
-      <rect width="560" height="280" rx="8" fill="#ffffff"/>
-      <text x="20" y="28" fill="#1a1d28" fontSize="13" fontWeight="700">Door &amp; Window — inserimento in pianta</text>
-      {/* Wall */}
-      <rect x="60" y="80" width="440" height="14" rx="2" fill="#8a92a0"/>
-      <text x="20" y="91" fill="#5a6270" fontSize="8">Muro →</text>
-      {/* Door in wall */}
-      <rect x="160" y="80" width="60" height="14" rx="0" fill="#ffffff" stroke="#f59e0b" strokeWidth="1"/>
-      <path d="M160 94 Q190 130 220 94" fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="4,2"/>
-      <text x="163" y="75" fill="#f59e0b" fontSize="8" fontWeight="700">🚪 Door</text>
-      {/* Window in wall */}
-      <rect x="310" y="80" width="50" height="14" fill="#dbe7fc" stroke="#3d7ef5" strokeWidth="1.5"/>
-      <line x1="335" y1="80" x2="335" y2="94" stroke="#3d7ef5" strokeWidth="1"/>
-      <text x="308" y="75" fill="#3d7ef5" fontSize="8" fontWeight="700">🪟 Window</text>
-      {/* Flip arrows */}
-      <path d="M185 100 L175 110 M185 100 L195 110" stroke="#22c55e" strokeWidth="2"/>
-      <text x="155" y="125" fill="#22c55e" fontSize="7">Frecce blu = inverti</text>
-      <text x="155" y="135" fill="#22c55e" fontSize="7">orientamento</text>
-      {/* Ribbon path */}
-      <rect x="40" y="160" width="480" height="30" rx="4" fill="#dbe7fc" stroke="#e9edf5" strokeWidth="1"/>
-      <text x="50" y="170" fill="#7a8290" fontSize="8">Architecture →</text>
-      <rect x="120" y="163" width="35" height="22" rx="3" fill="#eaf1fd" stroke="#3d7ef5" strokeWidth="1"/>
-      <text x="126" y="172" fill="#2563c9" fontSize="7" fontWeight="600">Build</text>
-      <text x="124" y="180" fill="#7a8290" fontSize="6">panel</text>
-      <text x="163" y="174" fill="#7a8290" fontSize="8">→</text>
-      <rect x="175" y="163" width="35" height="22" rx="3" fill="#3d7ef5" opacity="0.8"/>
-      <text x="180" y="177" fill="white" fontSize="8" fontWeight="700">Door</text>
-      <text x="218" y="174" fill="#7a8290" fontSize="8">oppure</text>
-      <rect x="245" y="163" width="40" height="22" rx="3" fill="#3d7ef5" opacity="0.8"/>
-      <text x="248" y="177" fill="white" fontSize="8" fontWeight="700">Window</text>
-      {/* Tips */}
-      <rect x="40" y="205" width="480" height="60" rx="4" fill="#eef1f7" stroke="#e9edf5" strokeWidth="1"/>
-      <text x="52" y="220" fill="#f59e0b" fontSize="8" fontWeight="700">⚠️ Importante:</text>
-      <text x="52" y="234" fill="#5a6270" fontSize="8">• La porta/finestra si inserisce SOLO su un muro esistente</text>
-      <text x="52" y="247" fill="#5a6270" fontSize="8">• Avvicina il cursore al muro finché non appare l'anteprima</text>
-      <text x="52" y="260" fill="#5a6270" fontSize="8">• Le frecce blu indicano verso dove si apre — clicca per invertire</text>
-    </svg>
-  ),
-
-  floor: (
-    <svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",maxWidth:"560px"}}>
-      <rect width="560" height="300" rx="8" fill="#ffffff"/>
-      <text x="20" y="28" fill="#1a1d28" fontSize="13" fontWeight="700">Floor — Sketch Mode</text>
-      {/* Step 1: walls */}
-      <rect x="10" y="40" width="165" height="120" rx="4" fill="#f4f6fb" stroke="#e9edf5" strokeWidth="1"/>
-      <text x="18" y="54" fill="#7a8290" fontSize="7">① Muri esistenti</text>
-      <rect x="25" y="60" width="135" height="90" rx="1" fill="none" stroke="#8a92a0" strokeWidth="8"/>
-      {/* Step 2: sketch mode */}
-      <rect x="185" y="40" width="165" height="120" rx="4" fill="#f4f6fb" stroke="#f59e0b" strokeWidth="1.5"/>
-      <text x="193" y="54" fill="#f59e0b" fontSize="7">② Sketch Mode attivo</text>
-      <rect x="200" y="60" width="135" height="90" rx="1" fill="none" stroke="#f59e0b" strokeWidth="2" strokeDasharray="6,3"/>
-      <text x="240" y="110" fill="#f59e0b" fontSize="8" opacity="0.6">Boundary</text>
-      <text x="245" y="122" fill="#f59e0b" fontSize="8" opacity="0.6">Lines</text>
-      {/* Step 3: finish */}
-      <rect x="360" y="40" width="190" height="120" rx="4" fill="#f4f6fb" stroke="#22c55e" strokeWidth="1.5"/>
-      <text x="368" y="54" fill="#22c55e" fontSize="7">③ Finish → pavimento creato</text>
-      <rect x="375" y="60" width="160" height="90" rx="1" fill="#3d7ef5" opacity="0.15" stroke="#22c55e" strokeWidth="1.5"/>
-      {/* Hatch pattern */}
-      <line x1="375" y1="70" x2="395" y2="70" stroke="#3d7ef5" strokeWidth="0.5" opacity="0.3"/>
-      <line x1="375" y1="80" x2="405" y2="80" stroke="#3d7ef5" strokeWidth="0.5" opacity="0.3"/>
-      <line x1="375" y1="90" x2="415" y2="90" stroke="#3d7ef5" strokeWidth="0.5" opacity="0.3"/>
-      <line x1="375" y1="100" x2="425" y2="100" stroke="#3d7ef5" strokeWidth="0.5" opacity="0.3"/>
-      <line x1="375" y1="110" x2="435" y2="110" stroke="#3d7ef5" strokeWidth="0.5" opacity="0.3"/>
-      <line x1="375" y1="120" x2="445" y2="120" stroke="#3d7ef5" strokeWidth="0.5" opacity="0.3"/>
-      <line x1="375" y1="130" x2="455" y2="130" stroke="#3d7ef5" strokeWidth="0.5" opacity="0.3"/>
-      <line x1="375" y1="140" x2="465" y2="140" stroke="#3d7ef5" strokeWidth="0.5" opacity="0.3"/>
-      <text x="420" y="110" fill="#22c55e" fontSize="11">✓</text>
-      {/* Arrows between steps */}
-      <path d="M178 100 L183 100" stroke="#7a8290" strokeWidth="2" markerEnd="url(#arr2)"/>
-      <path d="M353 100 L358 100" stroke="#7a8290" strokeWidth="2" markerEnd="url(#arr2)"/>
-      <defs><marker id="arr2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#7a8290"/></marker></defs>
-      {/* Ribbon path */}
-      <rect x="10" y="175" width="540" height="30" rx="4" fill="#dbe7fc" stroke="#e9edf5" strokeWidth="1"/>
-      <text x="20" y="185" fill="#7a8290" fontSize="8">Architecture →</text>
-      <rect x="95" y="178" width="35" height="24" rx="3" fill="#eaf1fd" stroke="#3d7ef5" strokeWidth="1"/>
-      <text x="101" y="188" fill="#2563c9" fontSize="7">Build</text>
-      <text x="100" y="197" fill="#7a8290" fontSize="6">panel</text>
-      <text x="138" y="191" fill="#7a8290" fontSize="8">→</text>
-      <rect x="150" y="178" width="60" height="24" rx="3" fill="#3d7ef5" opacity="0.9"/>
-      <text x="155" y="195" fill="white" fontSize="8" fontWeight="700">Floor: Arch.</text>
-      {/* Finish button */}
-      <rect x="10" y="220" width="540" height="65" rx="4" fill="#eef1f7" stroke="#e9edf5" strokeWidth="1"/>
-      <text x="22" y="236" fill="#5a6270" fontSize="8">Quando sei in Sketch Mode, la ribbon cambia e appare il pannello verde:</text>
-      <rect x="200" y="244" width="100" height="28" rx="4" fill="#166534" stroke="#22c55e" strokeWidth="2"/>
-      <text x="220" y="258" fill="#22c55e" fontSize="11">✓</text>
-      <text x="234" y="258" fill="#22c55e" fontSize="8" fontWeight="700">Finish</text>
-      <text x="310" y="247" fill="#5a6270" fontSize="8">← Clicca qui per completare</text>
-      <text x="310" y="259" fill="#7a8290" fontSize="7">il pavimento. Se la boundary</text>
-      <text x="310" y="270" fill="#7a8290" fontSize="7">non è chiusa, Revit dà errore.</text>
-    </svg>
-  ),
-
-  families: (
-    <svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",maxWidth:"560px"}}>
-      <rect width="560" height="300" rx="8" fill="#ffffff"/>
-      <text x="20" y="28" fill="#1a1d28" fontSize="13" fontWeight="700">I 3 tipi di Famiglia in Revit</text>
-      {/* System */}
-      <rect x="10" y="45" width="165" height="200" rx="6" fill="#eef1f7" stroke="#3d7ef5" strokeWidth="2"/>
-      <rect x="10" y="45" width="165" height="28" rx="6" fill="#dbe7fc"/>
-      <text x="22" y="63" fill="#3d7ef5" fontSize="10" fontWeight="700">🧱 System Families</text>
-      <text x="18" y="85" fill="#6b7280" fontSize="8">Non si caricano</text>
-      <text x="18" y="97" fill="#6b7280" fontSize="8">dall'esterno — esistono</text>
-      <text x="18" y="109" fill="#6b7280" fontSize="8">solo nel progetto</text>
-      <rect x="18" y="120" width="150" height="16" rx="3" fill="#eaf1fd"/>
-      <text x="24" y="131" fill="#5a6270" fontSize="7">• Walls (Muri)</text>
-      <rect x="18" y="139" width="150" height="16" rx="3" fill="#eaf1fd"/>
-      <text x="24" y="150" fill="#5a6270" fontSize="7">• Floors (Pavimenti)</text>
-      <rect x="18" y="158" width="150" height="16" rx="3" fill="#eaf1fd"/>
-      <text x="24" y="169" fill="#5a6270" fontSize="7">• Ceilings (Soffitti)</text>
-      <rect x="18" y="177" width="150" height="16" rx="3" fill="#eaf1fd"/>
-      <text x="24" y="188" fill="#5a6270" fontSize="7">• Roofs (Tetti)</text>
-      <rect x="18" y="196" width="150" height="16" rx="3" fill="#eaf1fd"/>
-      <text x="24" y="207" fill="#5a6270" fontSize="7">• Stairs, Ramps</text>
-      <text x="18" y="232" fill="#7a8290" fontSize="7">Modificabile solo</text>
-      <text x="18" y="242" fill="#7a8290" fontSize="7">da Edit Type</text>
-      {/* Loadable */}
-      <rect x="195" y="45" width="165" height="200" rx="6" fill="#eef1f7" stroke="#9b4ff7" strokeWidth="2"/>
-      <rect x="195" y="45" width="165" height="28" rx="6" fill="#f1ebfb"/>
-      <text x="200" y="63" fill="#7c3aed" fontSize="10" fontWeight="700">📂 Loadable Families</text>
-      <text x="203" y="85" fill="#6b7280" fontSize="8">File .rfa — si caricano</text>
-      <text x="203" y="97" fill="#6b7280" fontSize="8">da libreria o da web</text>
-      <text x="203" y="109" fill="#6b7280" fontSize="8">Puoi crearne di nuove!</text>
-      <rect x="203" y="120" width="150" height="16" rx="3" fill="#f1ebfb"/>
-      <text x="209" y="131" fill="#5a6270" fontSize="7">• Doors (Porte)</text>
-      <rect x="203" y="139" width="150" height="16" rx="3" fill="#f1ebfb"/>
-      <text x="209" y="150" fill="#5a6270" fontSize="7">• Windows (Finestre)</text>
-      <rect x="203" y="158" width="150" height="16" rx="3" fill="#f1ebfb"/>
-      <text x="209" y="169" fill="#5a6270" fontSize="7">• Furniture (Mobili)</text>
-      <rect x="203" y="177" width="150" height="16" rx="3" fill="#f1ebfb"/>
-      <text x="209" y="188" fill="#5a6270" fontSize="7">• Columns (Colonne)</text>
-      <rect x="203" y="196" width="150" height="16" rx="3" fill="#f1ebfb"/>
-      <text x="209" y="207" fill="#5a6270" fontSize="7">• Lighting fixtures</text>
-      <text x="203" y="232" fill="#9b4ff7" fontSize="7">Insert → Load Family</text>
-      <text x="203" y="242" fill="#7a8290" fontSize="7">per caricarle</text>
-      {/* In-place */}
-      <rect x="380" y="45" width="170" height="200" rx="6" fill="#eef1f7" stroke="#f59e0b" strokeWidth="2"/>
-      <rect x="380" y="45" width="170" height="28" rx="6" fill="#fdf6e3"/>
-      <text x="386" y="63" fill="#f59e0b" fontSize="10" fontWeight="700">✏️ In-Place Families</text>
-      <text x="388" y="85" fill="#6b7280" fontSize="8">Create direttamente</text>
-      <text x="388" y="97" fill="#6b7280" fontSize="8">nel progetto per</text>
-      <text x="388" y="109" fill="#6b7280" fontSize="8">forme uniche</text>
-      <rect x="388" y="120" width="154" height="16" rx="3" fill="#fdf6e3"/>
-      <text x="394" y="131" fill="#5a6270" fontSize="7">• Forme architettoniche</text>
-      <rect x="388" y="139" width="154" height="16" rx="3" fill="#fdf6e3"/>
-      <text x="394" y="150" fill="#5a6270" fontSize="7">  personalizzate</text>
-      <rect x="388" y="158" width="154" height="16" rx="3" fill="#fdf6e3"/>
-      <text x="394" y="169" fill="#5a6270" fontSize="7">• Elementi non standard</text>
-      <text x="388" y="200" fill="#f59e0b" fontSize="7">⚠️ Usa raramente:</text>
-      <text x="388" y="212" fill="#7a8290" fontSize="7">pesante sul file,</text>
-      <text x="388" y="224" fill="#7a8290" fontSize="7">difficile da riutilizzare</text>
-      <text x="388" y="236" fill="#7a8290" fontSize="7">su altri progetti</text>
-    </svg>
-  )
-};
-
 // ── Translations ──────────────────────────────────────────────
 const T = {
   it: {
-    appSubtitle: "Revit per principianti",
+    appSubtitle: "Revit per il Landscape",
     progress: "Progresso",
     tabChat: "💬 Tutor AI",
     tabSteps: "📋 Guida Passo-Passo",
@@ -600,34 +14,35 @@ const T = {
     startLesson: "Inizia lezione",
     viewGuide: "📋 Vedi guida",
     diagram: "📊 Diagramma visivo",
-    inputPlaceholder: "{t.inputPlaceholder}",
+    inputPlaceholder: "Fai una domanda o descrivi cosa hai fatto in Revit...",
     inputHint: "📎 Screenshot Revit per feedback visivo · Enter per inviare",
     send: "Invia",
     prev: "← Prec",
     next: "Pros →",
     screenshotLabel: "📎 Screenshot allegato",
-    helpBtn: "?",
     docsBtn: "📖 Docs",
     videoBtn: "🎥 Video",
     lessonOf: (n, tot) => `Lezione ${n} di ${tot}`,
-    welcomeTitle: "Benvenuto in BIMentor",
-    welcomeSubtitle: "Il tuo tutor AI per imparare Revit da zero",
-    welcomeIntro: "BIMentor ti accompagna lezione per lezione, come un collega esperto seduto accanto a te. Ecco come usarlo al meglio:",
+    sectionBase: "FONDAMENTA REVIT",
+    sectionLandscape: "LANDSCAPE",
+    welcomeTitle: "Benvenuto in BIMentor Landscape",
+    welcomeSubtitle: "Il tuo tutor AI per il BIM nel paesaggio",
+    welcomeIntro: "Questo percorso ti porta da zero alla modellazione Landscape professionale in Revit. Prima le fondamenta, poi le tecniche specialistiche per paving, grading, drainage e topografia.",
     welcomeTip: "Consiglio:",
-    welcomeTipText: "tieni Revit aperto accanto a BIMentor (o su un secondo monitor). Leggi, prova subito in Revit, e torna qui quando hai dubbi. Imparare facendo è il metodo.",
-    welcomeStart: "Iniziamo 🚀",
+    welcomeTipText: "in Revit non esistono tool nativi per il Landscape — imparerai a piegare i tool architettonici (Floor, Wall, Sweep) all'uso paesaggistico. Tieni Revit aperto e prova subito ogni tecnica.",
+    welcomeStart: "Iniziamo 🌿",
     welcomeFeatures: [
-      { icon: "💬", title: "Tutor AI", desc: "Clicca \"Inizia lezione\" e l'AI ti spiega il primo concetto. Fai domande liberamente quando sei bloccato." },
-      { icon: "📋", title: "Guida Passo-Passo", desc: "La seconda tab contiene gli step pratici con diagrammi visivi. Per ogni step puoi cliccare \"Chiedi all'AI\" per approfondire." },
-      { icon: "📖", title: "Docs Autodesk", desc: "Il bottone in alto apre la documentazione ufficiale Autodesk sulla lezione corrente." },
-      { icon: "📎", title: "Screenshot", desc: "Carica uno screenshot di Revit con la graffetta e l'AI ti dirà cosa hai fatto bene e cosa correggere." },
+      { icon: "🌿", title: "Percorso Landscape", desc: "13 lezioni di fondamenta Revit + 16 lezioni specialistiche Landscape: paving, grading, drainage, toposurface, net/cut/fill." },
+      { icon: "💬", title: "Tutor AI", desc: "Clicca \"Inizia lezione\" e l'AI ti guida. Fai domande quando sei bloccato — conosce il contesto di ogni lezione." },
+      { icon: "📋", title: "Guida Passo-Passo", desc: "Step pratici con diagrammi per ogni tecnica. Clicca \"Chiedi all'AI\" su ogni step per approfondire." },
+      { icon: "📎", title: "Screenshot", desc: "Carica uno screenshot di Revit e l'AI ti dirà cosa hai fatto bene e cosa correggere." },
     ],
     startPrompt: "Inizia la lezione",
     askStepPrompt: (icon, label) => `Spiegami nel dettaglio: "${icon} ${label}"`,
     askStepDisplay: (icon, label) => `Spiegami: ${icon} ${label}`,
   },
   en: {
-    appSubtitle: "Revit for beginners",
+    appSubtitle: "Revit for Landscape",
     progress: "Progress",
     tabChat: "💬 AI Tutor",
     tabSteps: "📋 Step-by-Step Guide",
@@ -644,21 +59,22 @@ const T = {
     prev: "← Prev",
     next: "Next →",
     screenshotLabel: "📎 Screenshot attached",
-    helpBtn: "?",
     docsBtn: "📖 Docs",
     videoBtn: "🎥 Video",
     lessonOf: (n, tot) => `Lesson ${n} of ${tot}`,
-    welcomeTitle: "Welcome to BIMentor",
-    welcomeSubtitle: "Your AI tutor to learn Revit from scratch",
-    welcomeIntro: "BIMentor guides you lesson by lesson, like an expert colleague sitting next to you. Here's how to get the most out of it:",
+    sectionBase: "REVIT FOUNDATIONS",
+    sectionLandscape: "LANDSCAPE",
+    welcomeTitle: "Welcome to BIMentor Landscape",
+    welcomeSubtitle: "Your AI tutor for Landscape BIM",
+    welcomeIntro: "This path takes you from zero to professional Landscape modelling in Revit. Foundations first, then the specialist techniques for paving, grading, drainage and topography.",
     welcomeTip: "Tip:",
-    welcomeTipText: "Keep Revit open next to BIMentor (or on a second monitor). Read, try it immediately in Revit, and come back when you have questions. Learning by doing is the method.",
-    welcomeStart: "Let's start 🚀",
+    welcomeTipText: "Revit has no native Landscape tools — you'll learn to bend the architectural tools (Floor, Wall, Sweep) to landscape use. Keep Revit open and try every technique immediately.",
+    welcomeStart: "Let's start 🌿",
     welcomeFeatures: [
-      { icon: "💬", title: "AI Tutor", desc: "Click \"Start lesson\" and the AI explains the first concept. Ask freely whenever you're stuck." },
-      { icon: "📋", title: "Step-by-Step Guide", desc: "The second tab contains practical steps with visual diagrams. For each step you can click \"Ask AI\" to go deeper." },
-      { icon: "📖", title: "Autodesk Docs", desc: "The button at the top opens the official Autodesk documentation for the current lesson." },
-      { icon: "📎", title: "Screenshot", desc: "Upload a Revit screenshot with the paperclip and the AI will tell you what you did right and what to fix." },
+      { icon: "🌿", title: "Landscape Path", desc: "13 Revit foundation lessons + 16 specialist Landscape lessons: paving, grading, drainage, toposurface, net/cut/fill." },
+      { icon: "💬", title: "AI Tutor", desc: "Click \"Start lesson\" and the AI guides you. Ask questions when stuck — it knows the context of every lesson." },
+      { icon: "📋", title: "Step-by-Step Guide", desc: "Practical steps with diagrams for every technique. Click \"Ask AI\" on any step to go deeper." },
+      { icon: "📎", title: "Screenshot", desc: "Upload a Revit screenshot and the AI will tell you what you did right and what to fix." },
     ],
     startPrompt: "Start the lesson",
     askStepPrompt: (icon, label) => `Explain in detail: "${icon} ${label}"`,
@@ -666,176 +82,608 @@ const T = {
   }
 };
 
-// ── Curriculum translations ────────────────────────────────────
+const DOCS = "https://help.autodesk.com/view/RVT/2025/ENU/?query=";
+
+// ── Curriculum IT ─────────────────────────────────────────────
+const CURRICULUM = [
+  { id: 1, section: "base", title: "User Interface", topics: ["Ribbon", "Properties panel", "Project Browser", "Plan Views", "Navigazione 3D"], objective: "Orientarsi in Revit e capire dove si trovano i controlli principali.", docsUrl: DOCS+"user%20interface", videoQuery: "Revit user interface tutorial beginner", diagram: "ui", steps: [
+    { icon: "🖥️", label: "Apri Revit", desc: "Avvia Revit con un nuovo progetto, template Architectural." },
+    { icon: "📌", label: "Esplora il Ribbon", desc: "Clicca su Architecture, Massing & Site, Annotate, View e osserva i pannelli. Massing & Site sarà la tua scheda chiave per la topografia." },
+    { icon: "📋", label: "Properties Panel", desc: "A sinistra in alto: proprietà dell'elemento selezionato o della vista corrente. Abituati a guardarlo sempre." },
+    { icon: "🗂️", label: "Project Browser", desc: "A sinistra in basso: tutte le viste, sheets, famiglie del progetto." },
+    { icon: "🔍", label: "Area di disegno", desc: "Rotella per zoom, tasto centrale premuto per pan, Shift+centrale per orbit 3D." },
+  ]},
+  { id: 2, section: "base", title: "Concetti BIM", topics: ["BIM vs CAD", "Livelli", "Griglie", "Il dato nel modello"], objective: "Capire la logica BIM: ogni elemento contiene informazioni reali.", docsUrl: DOCS+"levels%20grids", videoQuery: "Revit levels grids BIM basics", diagram: null, steps: [
+    { icon: "💡", label: "BIM vs CAD", desc: "In CAD disegni linee. In Revit ogni elemento ha dati: materiale, costo, volume. Nel Landscape questo significa quantità di scavo, aree di pavimentazione, conteggi piante." },
+    { icon: "📏", label: "Levels", desc: "Architecture → Datum → Level. Nel Landscape i livelli definiscono le quote di riferimento del sito." },
+    { icon: "⊞", label: "Grids", desc: "Architecture → Datum → Grid. Assi di riferimento, utili nei progetti landscape di grande scala." },
+  ]},
+  { id: 3, section: "base", title: "Wall", topics: ["System families", "Compound walls", "Edit structure"], objective: "Creare e modificare muri — base per retaining walls e planter walls.", docsUrl: DOCS+"walls", videoQuery: "Revit wall tool tutorial", diagram: null, steps: [
+    { icon: "🧱", label: "Wall Tool", desc: "Architecture → Build → Wall: Architectural." },
+    { icon: "📐", label: "Scegli il tipo", desc: "Properties panel → tipo di muro. Duplica sempre prima di modificare." },
+    { icon: "✏️", label: "Disegna", desc: "Due click nell'area di disegno. ESC per uscire." },
+    { icon: "⚙️", label: "Edit Structure", desc: "Edit Type → Edit Structure: aggiungi strati e materiali. Stesso processo che userai per i muri di contenimento." },
+  ]},
+  { id: 4, section: "base", title: "Floor", topics: ["Compound floors", "Sketch mode", "Boundary"], objective: "Il Floor è IL tool del Landscape: diventerà paving, grading, rampe.", docsUrl: DOCS+"floors", videoQuery: "Revit floor tool tutorial", diagram: "floor", steps: [
+    { icon: "⬛", label: "Floor Tool", desc: "Architecture → Build → Floor: Architectural. Entri in Sketch Mode." },
+    { icon: "✏️", label: "Sketch Boundary", desc: "Disegna un perimetro chiuso con Boundary Line." },
+    { icon: "✅", label: "Finish", desc: "Spunta verde per completare. Boundary aperta = errore." },
+    { icon: "📐", label: "Edit Structure", desc: "Edit Type → Edit Structure: strati del pavimento. Nel Landscape qui definirai sub-base, allettamento e finitura della pavimentazione." },
+  ]},
+  { id: 5, section: "base", title: "Component & Column", topics: ["Loadable components", "Site components", "Load Family"], objective: "Inserire componenti — arredi urbani, alberi, attrezzature.", docsUrl: DOCS+"components", videoQuery: "Revit component placement tutorial", diagram: null, steps: [
+    { icon: "🪑", label: "Component Tool", desc: "Architecture → Build → Component. Nel Landscape: panchine, cestini, alberi, lampioni." },
+    { icon: "📦", label: "Load Family", desc: "Insert → Load Family per caricare famiglie dalle librerie. Massing & Site → Site Component per gli elementi di sito." },
+  ]},
+  { id: 6, section: "base", title: "Materiali", topics: ["Material browser", "Surface pattern", "Cut pattern"], objective: "Creare materiali — fondamentale per pavimentazioni e finiture esterne.", docsUrl: DOCS+"materials", videoQuery: "Revit materials tutorial", diagram: null, steps: [
+    { icon: "🎨", label: "Material Browser", desc: "Manage → Materials. Qui creerai i materiali di paving, ghiaia, prato, asfalto." },
+    { icon: "➕", label: "Crea materiale", desc: "Clicca + → rinomina (es. 'Paving_Granito_600x600')." },
+    { icon: "🖼️", label: "Surface Pattern", desc: "Tab Graphics → Surface Pattern: come appare in pianta. Per il paving è il pattern delle lastre." },
+    { icon: "✂️", label: "Cut Pattern", desc: "Tab Graphics → Cut Pattern: il retino quando l'elemento è sezionato." },
+  ]},
+  { id: 7, section: "base", title: "Famiglie — Parte 1", topics: ["System vs Loadable vs In-place", "Logica parametrica"], objective: "Capire le famiglie — nel Landscape userai molto le in-place e i profili.", docsUrl: DOCS+"families", videoQuery: "Revit families explained system loadable", diagram: null, steps: [
+    { icon: "📦", label: "Cosa sono", desc: "Ogni elemento è una Famiglia. Floor e Wall sono system; alberi e arredi sono loadable; il drainage custom sarà in-place." },
+    { icon: "🧱", label: "System Families", desc: "Muri, pavimenti, toposurface. Esistono solo nel progetto." },
+    { icon: "📂", label: "Loadable Families", desc: "File .rfa: alberi, arredi, profili. Le carichi da libreria." },
+    { icon: "✏️", label: "In-place Families", desc: "Geometrie uniche nel progetto. Nel Landscape: drainage che segue le pendenze, elementi custom." },
+  ]},
+  { id: 8, section: "base", title: "Famiglie — Parte 2", topics: ["Tipo vs Istanza", "Parametri"], objective: "Distinguere parametri di tipo e di istanza.", docsUrl: DOCS+"type%20instance%20properties", videoQuery: "Revit type instance parameters", diagram: null, steps: [
+    { icon: "📋", label: "Type vs Instance", desc: "TYPE cambia tutte le copie (es. spessore paving). INSTANCE cambia solo l'elemento selezionato (es. quota di un singolo floor)." },
+    { icon: "⚙️", label: "Edit Type", desc: "Properties → Edit Type. Duplica SEMPRE prima di modificare — regola d'oro." },
+  ]},
+  { id: 9, section: "base", title: "Famiglie — Parte 3", topics: ["Family Editor", "Reference planes", "Extrusion"], objective: "Creare una famiglia da zero — preparazione per i profili Landscape.", docsUrl: DOCS+"family%20editor", videoQuery: "Revit family editor create family", diagram: null, steps: [
+    { icon: "📁", label: "Family Editor", desc: "File → New → Family → scegli template (es. Generic Model.rft)." },
+    { icon: "✚", label: "Reference Planes", desc: "Create → Datum → Reference Plane: lo scheletro della geometria." },
+    { icon: "📦", label: "Extrusion", desc: "Create → Forms → Extrusion: profilo 2D + profondità = solido." },
+    { icon: "💾", label: "Load into Project", desc: "Create → Load into Project." },
+  ]},
+  { id: 10, section: "base", title: "Stairs & Railing", topics: ["Stair by component", "Run", "Railing host"], objective: "Scale e ringhiere — elementi ricorrenti nel paesaggio.", docsUrl: DOCS+"stairs%20railings", videoQuery: "Revit stairs railing tutorial", diagram: null, steps: [
+    { icon: "🪜", label: "Stair Tool", desc: "Architecture → Circulation → Stair. Run per le rampe, landing automatici. Due opzioni: sketch da zero o tipo standard esistente." },
+    { icon: "🔧", label: "Railing", desc: "Architecture → Circulation → Railing. Su host (scale) o su sketch path libero." },
+  ]},
+  { id: 11, section: "base", title: "Visibility & Graphics", topics: ["VG overrides (VV)", "Filtri", "View templates"], objective: "Controllare la grafica — essenziale per i piani landscape complessi.", docsUrl: DOCS+"visibility%20graphics", videoQuery: "Revit visibility graphics overrides", diagram: null, steps: [
+    { icon: "👁️", label: "Apri VG", desc: "Shortcut VV. Override per categoria, visibilità worksets." },
+    { icon: "🔍", label: "Filtri", desc: "Regole su parametri — es. colora di verde tutto il Soft Landscape." },
+    { icon: "📋", label: "View Template", desc: "Salva impostazioni per riusarle: General Arrangement, Grading Plan, Planting Plan." },
+  ]},
+  { id: 12, section: "base", title: "Viste e Sezioni", topics: ["Floor plans", "Sezioni", "3D views", "Duplicate"], objective: "Creare le viste per la documentazione landscape.", docsUrl: DOCS+"views%20sections", videoQuery: "Revit views sections tutorial", diagram: null, steps: [
+    { icon: "📐", label: "Floor Plan", desc: "View → Plan Views → Floor Plan. Nel landscape: GA, Grading, Hard/Soft Landscape per livello." },
+    { icon: "✂️", label: "Section", desc: "View → Section. Site-wide e di dettaglio." },
+    { icon: "📦", label: "Vista 3D", desc: "Default 3D View. Usa 2 viste affiancate (pianta+3D) quando lavori sul terreno." },
+  ]},
+  { id: 13, section: "base", title: "Sheets", topics: ["Titleblock", "Viewport", "Output"], objective: "Comporre le tavole di progetto.", docsUrl: DOCS+"sheets%20titleblock", videoQuery: "Revit sheets titleblock tutorial", diagram: null, steps: [
+    { icon: "📄", label: "Nuovo Sheet", desc: "View → Sheet. Trascina le viste dal Project Browser." },
+    { icon: "📋", label: "Titleblock", desc: "Doppio clic per compilare numero, titolo, revisione." },
+  ]},
+  { id: 14, section: "landscape", title: "BIM for Landscape", topics: ["Vantaggi e sfide", "Nessun tool nativo", "EIR e scala progetto"], objective: "Capire il contesto: in Revit il Landscape si fa piegando i tool architettonici.", docsUrl: DOCS+"site%20design", videoQuery: "Revit landscape architecture BIM site design", diagram: null, steps: [
+    { icon: "💡", label: "Il principio chiave", desc: "Revit NON ha tool nativi per il Landscape. Userai Floor per il paving, Wall per i muri di contenimento, Sweep per drainage e cordoli. Questa è la mentalità da adottare." },
+    { icon: "✅", label: "Vantaggi", desc: "Collaborazione integrata, schedule e budget aggiornati automaticamente al cambiare del design, quantità reali (scavi, riporti, aree), analisi rapida di scenari, approccio lean con meno sprechi." },
+    { icon: "⚠️", label: "Sfide", desc: "Toposurface a triangoli (non contorni), nessuna interazione topo-paving, molti consulenti ancora in 2D, interoperabilità software, frustrazione iniziale degli utenti — si supera con buona strategia di modellazione e training." },
+    { icon: "📋", label: "Cosa determina il modello", desc: "Scala, uso, location, design e fase del progetto — ma soprattutto ciò che è contrattualmente concordato col cliente e scritto nell'EIR." },
+  ]},
+  { id: 15, section: "landscape", title: "Worksets & Collaborazione", topics: ["Central model", "Naming standard", "Divisione tipica"], objective: "Impostare la collaborazione multi-utente con worksets ben organizzati.", docsUrl: DOCS+"worksets", videoQuery: "Revit worksets worksharing tutorial", diagram: null, steps: [
+    { icon: "🤝", label: "Central model", desc: "Dal primo giorno lavorerai in un modello centrale condiviso, accessibile da più utenti contemporaneamente. I worksets sono la chiave della collaborazione." },
+    { icon: "🏷️", label: "Naming convention", desc: "Field 1: Zona (opzionale — progetti grandi divisi orizzontalmente o verticalmente). Field 2: Contenuto. Naming coerente e logico, secondo standard aziendali e ISO." },
+    { icon: "📂", label: "Worksets Site", desc: "S-01_Components, S-02_Existing_Topography, S-03_Proposed_Topography, S-04_Existing_Planting, S-05_Entourage, S-06_Masses." },
+    { icon: "🧱", label: "Worksets Hard Landscape", desc: "HL-01_Paving, HL-02_Stairs_Ramps_Railings, HL-03_Walls_Fences, HL-04_Furniture." },
+    { icon: "🌳", label: "Worksets Soft Landscape", desc: "SL-01_Trees, SL-02_Planting, SL-03_Shrubs. Questa divisione è importante nelle fasi successive per sheets e visualizzazioni." },
+  ]},
+  { id: 16, section: "landscape", title: "Viste per il Landscape", topics: ["General Arrangement", "Grading Plan", "Hard/Soft Landscape"], objective: "Creare il set di viste base di un progetto landscape.", docsUrl: DOCS+"view%20templates", videoQuery: "Revit view templates site plan", diagram: null, steps: [
+    { icon: "📐", label: "Floorplans per livello", desc: "General Arrangement, Grading and Levels, Hard Landscape and Furniture, Soft Landscape." },
+    { icon: "📦", label: "Viste 3D", desc: "Site View, Tree and Planting views, Hardscape, Softscape." },
+    { icon: "⬆️", label: "Prospetti e Sezioni", desc: "Site-wide elevations/sections + detail elevations/sections." },
+    { icon: "📋", label: "View Templates", desc: "Crea un view template per ogni tipo di vista così le impostazioni grafiche sono coerenti su tutto il progetto." },
+  ]},
+  { id: 17, section: "landscape", title: "Paving — Floor Tool", topics: ["Floor come pavimentazione", "Duplicare tipi", "Strati"], objective: "Creare pavimentazioni esterne usando il Floor tool.", docsUrl: DOCS+"floors", videoQuery: "Revit floor paving landscape tutorial", diagram: "paving", steps: [
+    { icon: "🧱", label: "Il concetto", desc: "Il paving è l'elemento hard landscape più comune. Si modella con il Floor tool: fa da host per famiglie, top face alla quota del livello, shape editabile, si raccorda ai floor architettonici." },
+    { icon: "📋", label: "Nuovo tipo paving", desc: "Duplica un floor esistente → rinomina (es. Paving_Granito_60mm) → Edit Structure → cambia le proprietà." },
+    { icon: "📚", label: "Aggiungi strati", desc: "Aggiungi tutti i layer necessari a descrivere il materiale: sub-base, allettamento, finitura. Ogni strato con il suo materiale e spessore." },
+    { icon: "🌱", label: "Anche suolo e prato", desc: "Stesso metodo per terreno e prato: floor con strati come per un pavimento architettonico — l'unica differenza sono gli hatch appropriati." },
+  ]},
+  { id: 18, section: "landscape", title: "Filled Patterns 2D", topics: ["Model vs Drafting", "Surface pattern", "Filled regions"], objective: "Rappresentare correttamente il paving nelle piante 2D.", docsUrl: DOCS+"fill%20patterns", videoQuery: "Revit fill patterns model drafting", diagram: null, steps: [
+    { icon: "🔲", label: "Due tipi di pattern", desc: "Gli 'hatch' in Revit sono Filled Patterns (file PAT). MODEL: dimensione reale fissa, si adatta alla scala — perfetto per lastre, blocchi, tiles ma illeggibile a scale grandi. DRAFTING: dimensione costante a ogni scala — sempre leggibile ma non a misura reale." },
+    { icon: "🎨", label: "Applicali nel materiale", desc: "Floor editor → colonna Material → Material Editor → duplica o crea il materiale → definisci Surface pattern e Cut pattern." },
+    { icon: "📐", label: "Oppure Filled Region", desc: "Come material property il pattern è un elemento di modello; come filled region è specifico della vista. Nessuna soluzione giusta o sbagliata — dipende dal progetto, puoi anche combinarli per il tuo Hard Landscape Plan." },
+  ]},
+  { id: 19, section: "landscape", title: "Grading & Levels", topics: ["Modify sub-elements", "Add point", "Split lines", "Pendenze"], objective: "Dare pendenze e quote al paving — nel Landscape niente è piatto.", docsUrl: DOCS+"modify%20sub%20elements%20floor", videoQuery: "Revit floor grading modify sub elements slope", diagram: "grading", steps: [
+    { icon: "💡", label: "Perché serve", desc: "A differenza dell'architettura, il paving esterno è raramente piatto: servono falde e pendenze per il drenaggio e per raccordarsi alle quote esistenti. Seleziona il floor → nel ribbon appaiono i tool di shape editing." },
+    { icon: "🟩", label: "Dividi in pattern regolari", desc: "Dividi il paving in moduli regolari (es. quadrati) per controllare facilmente i cambi di quota ed evitare il warning: 'Thickness of this Floor may be slightly inaccurate due to extreme Shape Editing'." },
+    { icon: "✏️", label: "Edit Boundary", desc: "Modifica la forma del floor. ATTENZIONE: se cancelli/aggiungi segmenti su un floor già shaped, le quote tornano a 0. Sposta le linee senza cancellarle. Usa le dynamic dimensions cliccando sul valore." },
+    { icon: "📍", label: "Modify Sub-elements", desc: "Cambia la quota relativa di punti, segmenti e split lines. Numeri negativi = verso il basso. Così crei falde e pendenze." },
+    { icon: "➕", label: "Add Point", desc: "Aggiungi punti dentro la boundary. In questa modalità Revit non snappa agli elementi modello, solo a detail/model lines: traccia prima detail lines come guida." },
+    { icon: "📏", label: "Add Split Lines", desc: "Crea creste e valli. Genera automaticamente punto iniziale e finale a cui dare le quote. Anche qui le detail lines aiutano a posizionare con precisione." },
+    { icon: "🔄", label: "Reset Shape", desc: "Riporta il floor piatto rimuovendo tutte le modifiche." },
+  ]},
+  { id: 20, section: "landscape", title: "Drainage", topics: ["Famiglie floor-based", "Model in-place", "Sweep su path"], objective: "Modellare canalette e sistemi di drenaggio che seguono le pendenze.", docsUrl: DOCS+"sweep", videoQuery: "Revit landscape drainage sweep model in place", diagram: "drainage", steps: [
+    { icon: "💡", label: "Il problema", desc: "Non esiste un tool drainage in Revit. Griglie e caditoie = famiglie floor-based (seguono la pendenza). Canalette continue lungo le pendenze = model in-place con sweep." },
+    { icon: "📦", label: "Via 1 — Famiglia floor-based", desc: "Carica famiglie dal tab Systems o dalle librerie: applicate al floor ne seguono la pendenza. REGOLA: devono essere floor-based, altrimenti NON seguiranno la pendenza." },
+    { icon: "✏️", label: "Via 2 — Model In-Place", desc: "Architecture → Component → Model In-Place. Scegli una categoria appropriata per le schedules future: Specialty Equipment o Plumbing Fixture. Nomina il componente descrivendo elemento e dimensione." },
+    { icon: "🛤️", label: "Sweep + Pick Path", desc: "Usa Sweep (estrude un profilo su un percorso) → Pick Path → apri una vista 3D e seleziona il bordo del floor in pendenza. Apparirà un piano tratteggiato dove definire il profilo." },
+    { icon: "📐", label: "Profilo", desc: "Due opzioni: sketcha il profilo direttamente, oppure seleziona un Metric Profile caricato. Usa la barra con assi x/y per posizionarlo, una sezione per le distanze esatte, poi spunta verde." },
+    { icon: "🔄", label: "Aggiornamento automatico", desc: "Se il floor cambia quota o pendenza: seleziona l'elemento → l'elemento si aggiorna in accordo col floor senza ridisegnare path o profilo. Poi chiudi l'editor in-place." },
+  ]},
+  { id: 21, section: "landscape", title: "Creare un Profile", topics: ["Metric Profile family", "Profilo chiuso", "Load"], objective: "Creare profili custom per drainage, kerbs e copping stones.", docsUrl: DOCS+"profile%20family", videoQuery: "Revit profile family tutorial", diagram: null, steps: [
+    { icon: "📁", label: "Nuova famiglia", desc: "File → New → Family → seleziona il template Metric Profile." },
+    { icon: "✏️", label: "Disegna il profilo", desc: "Nel template 2D disegna con semplici linee. REGOLA: il profilo deve essere CHIUSO." },
+    { icon: "💾", label: "Salva e carica", desc: "Salva nella cartella profili del progetto → Load into Project. Ora è selezionabile quando usi Sweep, Slab Edge e Wall Sweep." },
+  ]},
+  { id: 22, section: "landscape", title: "Kerbs (Cordoli)", topics: ["Sloped vs flat", "Slab Edge tool"], objective: "Creare cordoli in pendenza e piani.", docsUrl: DOCS+"slab%20edge", videoQuery: "Revit slab edge kerb curb", diagram: null, steps: [
+    { icon: "🔀", label: "Due strade", desc: "Cordolo IN PENDENZA → stesso processo del drainage (sweep model in-place su path). Cordolo PIANO → Slab Edge tool, più rapido." },
+    { icon: "📋", label: "Slab Edge", desc: "Duplica la famiglia → rinomina in modo descrittivo → seleziona il profilo dalla lista → applica il materiale con surface e cut pattern → OK → clicca il bordo della slab." },
+    { icon: "📐", label: "Posizionamento", desc: "Seleziona lo slab edge e premi invio → nel Properties a sinistra trovi i constraints per posizionarlo correttamente. Il punto di inserimento dipende da come hai disegnato il profilo nella famiglia." },
+  ]},
+  { id: 23, section: "landscape", title: "Ramps nel Landscape", topics: ["Floor sloped vs Ramp tool"], objective: "Creare rampe esterne con il metodo più pratico.", docsUrl: DOCS+"ramps", videoQuery: "Revit sloped floor ramp landscape", diagram: null, steps: [
+    { icon: "⚠️", label: "Il Ramp tool è ostico", desc: "Revit ha un tool Ramp dedicato sotto Architecture ma è macchinoso da usare e gestire." },
+    { icon: "✅", label: "Usa i Floor", desc: "Consiglio pratico: usa floor in pendenza (Modify Sub-elements, come nel Grading). Più facile da creare, modificare e raccordare al paving circostante." },
+  ]},
+  { id: 24, section: "landscape", title: "Railings & Fences", topics: ["Sketch path", "Host", "Handrails", "Template"], objective: "Modellare ringhiere e recinzioni — uno degli elementi più complessi.", docsUrl: DOCS+"railings", videoQuery: "Revit railing fence tutorial", diagram: null, steps: [
+    { icon: "⚠️", label: "Premessa onesta", desc: "Le railing sono tra gli elementi più complessi di Revit, difficili da far funzionare come vuoi. Parti da template e famiglie esistenti di recinzioni e cancelli quando possibile." },
+    { icon: "✏️", label: "Sketch Path", desc: "Architecture → Railing → Sketch Path. Se la vista non è adatta, Revit ti chiede di sceglierne una. Pick New Host per agganciare a floor, rampa o scala. Attiva Preview per vedere la geometria mentre sketchi." },
+    { icon: "🪜", label: "Su scale", desc: "La railing va sketchata lungo la linea interna dello stringer per agganciarsi e inclinarsi correttamente. Su component-based stairs scegli posizionamento su Treads o Stringer." },
+    { icon: "🔧", label: "Handrails", desc: "Fino a 2 handrail per tipo di railing. Modifica le type properties di rail system (tipo e posizione), continuous rail (altezza, famiglia supports) e supports (layout, spacing, justification, number)." },
+    { icon: "🔄", label: "Posizione", desc: "Flip Railing Direction (doppia freccia) per invertire lato. Tread/Stringer offset per la regolazione fine: default 1/2 Stringer Width sugli stringer, 1 pollice sui treads." },
+    { icon: "🌐", label: "Free-standing", desc: "Le railing possono anche essere libere su un livello, o agganciate a slab edge, wall top, roof, topografia. Rails e balusters si piazzano automaticamente a intervalli regolari, definiti dai profili caricati." },
+  ]},
+  { id: 25, section: "landscape", title: "Retaining & Planter Walls", topics: ["Wall structure", "Sweeps", "Copping stone", "Foundation"], objective: "Muri di contenimento e fioriere con coronamenti e fondazioni.", docsUrl: DOCS+"wall%20sweeps", videoQuery: "Revit retaining wall sweep coping", diagram: null, steps: [
+    { icon: "🧱", label: "Usi nel Landscape", desc: "I muri nel paesaggio sono soprattutto: retaining walls (contenimento), planter walls (fioriere), balaustre. Sono system families di cui personalizzi composizione e spessore." },
+    { icon: "📋", label: "Modifica struttura", desc: "Duplica SEMPRE la famiglia prima di modificare → Edit Structure → Insert per aggiungere layer → frecce su/giù per posizionarli → assegna i materiali." },
+    { icon: "👑", label: "Copping stone con Sweep", desc: "Tipico nel landscape: coronamento e fondazione del retaining wall. Il modo più rapido: Wall Sweep. Aggiungi il profilo (o creane uno — vedi lezione Profile) → applica il materiale per dettagliarlo → usa i parametri e gli offset per posizionarlo in alto (copping) o in basso (foundation)." },
+    { icon: "📏", label: "Reveal", desc: "Usa i Reveal per creare pattern e scanalature diverse sulla superficie del muro." },
+  ]},
+  { id: 26, section: "landscape", title: "Toposurface", topics: ["Place points", "Create from import", "TIN da Civil 3D"], objective: "Creare la topografia — l'elemento più ostico di Revit.", docsUrl: DOCS+"toposurface", videoQuery: "Revit toposurface tutorial site", diagram: "topo", steps: [
+    { icon: "⚠️", label: "Limiti da conoscere", desc: "La toposurface non si comporta come gli altri elementi: un solo materiale che si estende all'infinito (niente strati né profondità), poche famiglie ospitabili (perlopiù entourage), niente vuoti, niente tool per specchi d'acqua, nessuna interazione con l'hard landscape, triangoli e non contorni." },
+    { icon: "📍", label: "Metodo 1 — Place Points", desc: "Massing & Site → Toposurface → Place Points: digita la quota e piazza manualmente. Tedioso su progetti grandi, ok per aree piccole. Usa 2 viste (pianta + 3D) per vedere la profondità dei punti." },
+    { icon: "📂", label: "Metodo 2 — Import DWG", desc: "Create from Import → Select Import Instance: Revit crea la toposurface dai punti del DWG (da AutoCAD o Civil 3D). Seleziona solo i layer con la geometria appropriata. È il metodo più comune." },
+    { icon: "📄", label: "Metodo 3 — Point file", desc: "Da file Excel/TXT con coordinate. Metodo poco usato." },
+    { icon: "⭐", label: "Best practice — TIN", desc: "Revit triangola i punti più vicini, quindi dai contorni il risultato è spesso impreciso. Chiedi al civil engineer (o al survey) di esportare una TIN surface da Civil 3D in DWG: selezioni i vertici come punti e il risultato è molto più accurato." },
+  ]},
+  { id: 27, section: "landscape", title: "Split Surface", topics: ["Dividere toposurface", "Landform", "Percorsi"], objective: "Dividere la topografia per disegnare percorsi e landform.", docsUrl: DOCS+"split%20surface", videoQuery: "Revit split surface topography", diagram: null, steps: [
+    { icon: "✂️", label: "Cosa fa", desc: "Divide la toposurface in due (massimo due superfici per volta). Visto che non ci sono tool di disegno per il terreno, Split è il modo per 'disegnare' percorsi, terrain e landform." },
+    { icon: "📂", label: "Con DWG di guida", desc: "L'ideale: importa un DWG con landform/percorsi già disegnati e seleziona le linee. In alternativa usa detail lines come guida per il pick." },
+    { icon: "✅", label: "Regione chiusa", desc: "Lo sketch deve formare una regione correttamente chiusa, altrimenti Revit non ti lascia uscire dall'editing mode." },
+    { icon: "👁️", label: "Due viste sempre", desc: "Lavora con pianta + 3D affiancate per verificare il risultato. Lo split non modifica le quote anche con pendenze diverse — divide solo le superfici per fartele gestire. Applica il materiale prima di terminare l'editing." },
+  ]},
+  { id: 28, section: "landscape", title: "Net / Cut / Fill", topics: ["Graded Region", "Volumi di scavo e riporto"], objective: "Calcolare scavi e riporti del landform — dato fondamentale di progetto.", docsUrl: DOCS+"graded%20region", videoQuery: "Revit graded region cut fill toposurface", diagram: "cutfill", steps: [
+    { icon: "💡", label: "Il task", desc: "Una delle richieste più comuni nel landscape: il calcolo Net/Cut/Fill del landform progettato. Si ottiene con il Graded Region tool." },
+    { icon: "✂️", label: "Prima: Split", desc: "Dividi la superficie come nella lezione precedente per isolare l'area di intervento." },
+    { icon: "📋", label: "Graded Region", desc: "Clicca Graded Region → si apre una finestra: scegli la PRIMA opzione, 'Create a new toposurface exactly like the existing one' (copia punti interni e perimetrali). Revit crea una superficie sopra quella esistente su cui puoi piazzare punti." },
+    { icon: "📍", label: "Piazza i punti", desc: "Metti i punti DENTRO la boundary del tuo landform o area. La nuova superficie creata fornirà il valore Net/Cut/Fill necessario." },
+    { icon: "📊", label: "Leggi i valori", desc: "Seleziona l'elemento creato → nel Properties trovi i dati Net/Cut/Fill in m³. La superficie resta sempre editabile; se la cancelli, il terreno torna alla forma originale." },
+  ]},
+  { id: 29, section: "landscape", title: "Progetto Finale Landscape", topics: ["Piazza urbana completa", "Dal terreno alle tavole"], objective: "Applicare tutto: un piccolo spazio pubblico end-to-end.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/", videoQuery: "Revit landscape site project tutorial", diagram: null, steps: [
+    { icon: "📋", label: "Brief", desc: "Piccola piazza urbana: paving in pendenza, canaletta di drenaggio, cordoli, muro di contenimento con copping stone, rampa, ringhiera, terreno con landform." },
+    { icon: "🌍", label: "Fase 1 — Terreno", desc: "Crea la toposurface, split per l'area pavimentata, calcola il cut/fill del landform con Graded Region." },
+    { icon: "🧱", label: "Fase 2 — Hard Landscape", desc: "Paving con grading e pendenze, drainage sweep sul bordo, kerbs, retaining wall con copping stone, rampa con floor sloped, railing." },
+    { icon: "📄", label: "Fase 3 — Documentazione", desc: "Grading plan con quote, General Arrangement, sezioni site-wide, sheets con view templates." },
+  ]},
+];
+
+// ── Curriculum EN ─────────────────────────────────────────────
 const CURRICULUM_EN = [
-  { id: 1, title: "User Interface", topics: ["Ribbon and main tabs", "Properties panel", "Project Browser", "Creating Plan Views", "Line Styles and Patterns", "Fill Patterns"], objective: "Navigate Revit and understand where the main controls are.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=user%20interface", videoQuery: "Revit user interface tutorial beginner", steps: [
-    { icon: "🖥️", label: "Open Revit", desc: "Launch Revit and open a new project with the Architectural template." },
-    { icon: "📌", label: "Explore the Ribbon", desc: "At the top is the Ribbon: click Architecture, Structure, Annotate, View and observe how the panels change." },
-    { icon: "📋", label: "Properties Panel", desc: "Top left: shows properties of the selected element. If nothing is selected, shows current view properties." },
-    { icon: "🗂️", label: "Project Browser", desc: "Bottom left: lists all views, sheets, families and groups in the project." },
-    { icon: "🔍", label: "Drawing area", desc: "Center: this is where you draw. Use the mouse wheel to zoom, hold middle button to pan." },
-  ], diagram: "ui" },
-  { id: 2, title: "BIM Concepts", topics: ["BIM vs CAD", "Levels", "Grids", "Disciplines and views"], objective: "Understand the BIM logic before modelling any element.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=levels%20grids", videoQuery: "Revit levels grids BIM basics", steps: [
-    { icon: "💡", label: "BIM vs CAD", desc: "In CAD you draw lines. In Revit you build a real 3D building — every element has real data: material, cost, area." },
-    { icon: "📏", label: "Levels", desc: "Architecture → Datum → Level. Levels define floor heights. Every wall attaches to a level." },
-    { icon: "⊞", label: "Grids", desc: "Architecture → Datum → Grid. Grids define structural axes as reference lines." },
-  ], diagram: "bim" },
-  { id: 3, title: "Wall", topics: ["System families", "Compound walls", "Stacked walls", "Edit wall structure"], objective: "Create and modify walls of different types and thicknesses.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=walls", videoQuery: "Revit wall tool tutorial", steps: [
-    { icon: "🧱", label: "Wall Tool", desc: "Architecture → Build → Wall → Wall: Architectural." },
-    { icon: "📐", label: "Choose type", desc: "Properties panel: click the wall type (e.g. Basic Wall 200mm) and change it from the dropdown." },
-    { icon: "✏️", label: "Draw", desc: "Click two points in the drawing area. Press ESC to exit the tool." },
-    { icon: "⚙️", label: "Edit Structure", desc: "Select wall → Properties → Edit Type → Edit Structure to modify layers." },
-  ], diagram: "wall" },
-  { id: 4, title: "Door & Window", topics: ["Inserting doors and windows", "Modify parameters", "Auto tags", "Alignment"], objective: "Insert doors and windows correctly into a wall.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=doors%20windows", videoQuery: "Revit doors windows tutorial", steps: [
-    { icon: "🚪", label: "Door Tool", desc: "Architecture → Build → Door. Move close to a wall and click to insert." },
-    { icon: "🪟", label: "Window Tool", desc: "Architecture → Build → Window. Click on the wall where you want the window." },
-    { icon: "↔️", label: "Flip orientation", desc: "After inserting, blue arrows appear: click them to flip the opening direction." },
-    { icon: "🏷️", label: "Auto tag", desc: "Annotate → Tag → Tag All to tag all doors and windows automatically." },
-  ], diagram: "door" },
-  { id: 5, title: "Component & Column", topics: ["Loadable components", "Architectural columns", "Structural columns"], objective: "Insert components and columns into the model.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=components%20columns", videoQuery: "Revit component column placement", steps: [
-    { icon: "🪑", label: "Component Tool", desc: "Architecture → Build → Component. Inserts loadable families like furniture and fixtures." },
-    { icon: "🏛️", label: "Column Tool", desc: "Architecture → Build → Column: Architectural for decorative columns." },
-    { icon: "📦", label: "Load Family", desc: "If not available, click Load Family in the ribbon to browse libraries." },
-  ], diagram: null },
-  { id: 6, title: "Floor", topics: ["Compound floors", "Boundary and sketch mode", "Floor slope", "Core boundary"], objective: "Create compound floors and manage boundaries.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=floors", videoQuery: "Revit floor tool tutorial", steps: [
+  { id: 1, section: "base", title: "User Interface", topics: ["Ribbon", "Properties panel", "Project Browser", "Plan Views", "3D navigation"], objective: "Navigate Revit and find the main controls.", docsUrl: DOCS+"user%20interface", videoQuery: "Revit user interface tutorial beginner", diagram: "ui", steps: [
+    { icon: "🖥️", label: "Open Revit", desc: "Start Revit with a new project, Architectural template." },
+    { icon: "📌", label: "Explore the Ribbon", desc: "Click Architecture, Massing & Site, Annotate, View and watch the panels change. Massing & Site will be your key tab for topography." },
+    { icon: "📋", label: "Properties Panel", desc: "Top left: properties of the selected element or current view. Get into the habit of always checking it." },
+    { icon: "🗂️", label: "Project Browser", desc: "Bottom left: all views, sheets, families in the project." },
+    { icon: "🔍", label: "Drawing area", desc: "Wheel to zoom, hold middle button to pan, Shift+middle for 3D orbit." },
+  ]},
+  { id: 2, section: "base", title: "BIM Concepts", topics: ["BIM vs CAD", "Levels", "Grids", "Data in the model"], objective: "Understand the BIM logic: every element carries real information.", docsUrl: DOCS+"levels%20grids", videoQuery: "Revit levels grids BIM basics", diagram: null, steps: [
+    { icon: "💡", label: "BIM vs CAD", desc: "In CAD you draw lines. In Revit every element has data: material, cost, volume. In Landscape this means cut/fill quantities, paving areas, plant counts." },
+    { icon: "📏", label: "Levels", desc: "Architecture → Datum → Level. In Landscape, levels define the site reference elevations." },
+    { icon: "⊞", label: "Grids", desc: "Architecture → Datum → Grid. Reference axes, useful in large-scale landscape projects." },
+  ]},
+  { id: 3, section: "base", title: "Wall", topics: ["System families", "Compound walls", "Edit structure"], objective: "Create and modify walls — the basis for retaining and planter walls.", docsUrl: DOCS+"walls", videoQuery: "Revit wall tool tutorial", diagram: null, steps: [
+    { icon: "🧱", label: "Wall Tool", desc: "Architecture → Build → Wall: Architectural." },
+    { icon: "📐", label: "Choose type", desc: "Properties panel → wall type. Always duplicate before modifying." },
+    { icon: "✏️", label: "Draw", desc: "Two clicks in the drawing area. ESC to exit." },
+    { icon: "⚙️", label: "Edit Structure", desc: "Edit Type → Edit Structure: add layers and materials. Same process you'll use for retaining walls." },
+  ]},
+  { id: 4, section: "base", title: "Floor", topics: ["Compound floors", "Sketch mode", "Boundary"], objective: "The Floor is THE Landscape tool: it becomes paving, grading, ramps.", docsUrl: DOCS+"floors", videoQuery: "Revit floor tool tutorial", diagram: "floor", steps: [
     { icon: "⬛", label: "Floor Tool", desc: "Architecture → Build → Floor: Architectural. You enter Sketch Mode." },
     { icon: "✏️", label: "Sketch Boundary", desc: "Draw a closed perimeter with Boundary Lines." },
-    { icon: "✅", label: "Finish Sketch", desc: "Click the green checkmark (Finish Edit Mode)." },
-    { icon: "📐", label: "Edit Structure", desc: "Select floor → Edit Type → Edit Structure to add layers." },
-  ], diagram: "floor" },
-  { id: 7, title: "Ceiling", topics: ["Compound ceilings", "Height offset", "Patterns and grids", "Automatic ceiling"], objective: "Create ceilings and manage height and pattern.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=ceilings", videoQuery: "Revit ceiling tutorial", steps: [
-    { icon: "⬜", label: "Ceiling Tool", desc: "Architecture → Build → Ceiling. Use Automatic Ceiling by clicking inside a closed room." },
-    { icon: "📏", label: "Set height", desc: "Properties panel: modify Height Offset From Level." },
-    { icon: "🔲", label: "Change pattern", desc: "Edit Type → modify Compound Structure for material and pattern." },
-  ], diagram: null },
-  { id: 8, title: "Roof", topics: ["Roof by footprint", "Roof by extrusion", "Slope arrow", "Overhang and fascia"], objective: "Model pitched and flat roofs correctly.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=roofs", videoQuery: "Revit roof tutorial", steps: [
-    { icon: "🏠", label: "Roof by Footprint", desc: "Architecture → Build → Roof → Roof by Footprint." },
-    { icon: "📐", label: "Set slope", desc: "Select each boundary line → Properties → enable Defines Roof Slope and set angle." },
-    { icon: "↔️", label: "Overhang", desc: "Properties: set Overhang to extend the roof beyond the walls." },
-    { icon: "🏗️", label: "Roof by Extrusion", desc: "Useful for barrel roofs: draw the profile in section and extrude along an axis." },
-  ], diagram: null },
-  { id: 9, title: "Curtain Wall & Mullions", topics: ["Curtain wall system", "Curtain grid", "Panels", "Mullions"], objective: "Create continuous facades with custom grids and mullions.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=curtain%20walls", videoQuery: "Revit curtain wall mullions tutorial", steps: [
-    { icon: "🏢", label: "Curtain Wall", desc: "Architecture → Build → Wall → choose Curtain Wall type." },
-    { icon: "⊞", label: "Curtain Grid", desc: "Architecture → Build → Curtain Grid. Click on the wall to add grid lines." },
-    { icon: "🔳", label: "Mullion", desc: "Architecture → Build → Mullion. Click on grid lines to add mullions." },
-    { icon: "🚪", label: "Replace panel", desc: "Select panel → Properties → change type (e.g. door or opaque panel)." },
-  ], diagram: null },
-  { id: 10, title: "Stairs & Railing", topics: ["Stair by component", "Run and landing", "Railing", "Custom baluster"], objective: "Model stairs and railings with correct geometry.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=stairs%20railings", videoQuery: "Revit stairs railing tutorial", steps: [
-    { icon: "🪜", label: "Stair Tool", desc: "Architecture → Circulation → Stair." },
-    { icon: "➡️", label: "Create Run", desc: "Click Run and draw the direction. Revit counts risers automatically." },
-    { icon: "⬛", label: "Landing", desc: "With multiple runs, Revit creates the landing automatically." },
-    { icon: "🔧", label: "Railing", desc: "Architecture → Circulation → Railing. Attach to a path or existing stair." },
-  ], diagram: null },
-  { id: 11, title: "Opening", topics: ["Wall opening", "Shaft opening", "Vertical opening"], objective: "Create openings in model elements.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=openings", videoQuery: "Revit shaft opening tutorial", steps: [
-    { icon: "🔲", label: "Wall Opening", desc: "Architecture → Opening → Wall Opening. Click the wall and draw the rectangle." },
-    { icon: "⬇️", label: "Shaft Opening", desc: "Architecture → Opening → Shaft. Cuts vertically through multiple levels." },
-    { icon: "⬜", label: "Vertical Opening", desc: "Architecture → Opening → Vertical. Cuts through a floor or roof." },
-  ], diagram: null },
-  { id: 12, title: "Room & Area", topics: ["Room placement", "Room tag", "Area plan", "Color fill"], objective: "Define and visualise rooms and areas in the model.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=rooms%20areas", videoQuery: "Revit rooms areas tutorial", steps: [
-    { icon: "🏠", label: "Room Tool", desc: "Architecture → Room & Area → Room. Click inside a closed room." },
-    { icon: "🏷️", label: "Room Tag", desc: "Tag appears automatically. Double-click to rename." },
-    { icon: "🗺️", label: "Area Plan", desc: "Architecture → Room & Area → Area Plan." },
-    { icon: "🎨", label: "Color Fill", desc: "Annotate → Color Fill → Color Fill Legend to colour rooms by function." },
-  ], diagram: null },
-  { id: 13, title: "Materials", topics: ["Material browser", "Create material", "Surface pattern", "Cut pattern", "Render appearance"], objective: "Create custom materials and assign them to elements.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=materials", videoQuery: "Revit materials tutorial", steps: [
-    { icon: "🎨", label: "Material Browser", desc: "Manage → Materials. Opens the material browser." },
-    { icon: "➕", label: "Create material", desc: "Click + at the bottom. Rename the material." },
-    { icon: "🖼️", label: "Surface Pattern", desc: "Graphics tab → Surface Pattern: 2D texture in plan/elevation." },
-    { icon: "✂️", label: "Cut Pattern", desc: "Graphics tab → Cut Pattern: section hatch pattern." },
-  ], diagram: null },
-  { id: 14, title: "Families — Part 1", topics: ["What is a family", "System vs Loadable vs In-place", "Parametric logic"], objective: "Understand the family structure after having used real elements.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=families", videoQuery: "Revit families explained system loadable", steps: [
-    { icon: "📦", label: "What they are", desc: "Every element in Revit is a Family. Walls, doors, windows — they are all families." },
-    { icon: "🧱", label: "System Families", desc: "Cannot be loaded externally: walls, floors, ceilings, roofs. They exist only inside the project." },
-    { icon: "📂", label: "Loadable Families", desc: ".rfa files: doors, windows, furniture. You can create new ones." },
-    { icon: "✏️", label: "In-place Families", desc: "Unique geometry created inside the project. Only for non-standard shapes." },
-  ], diagram: "families" },
-  { id: 15, title: "Families — Part 2", topics: ["Type vs Instance", "Type parameters", "Instance parameters"], objective: "Distinguish and modify type and instance parameters.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=type%20instance%20properties", videoQuery: "Revit type instance parameters", steps: [
-    { icon: "📋", label: "Type vs Instance", desc: "TYPE: changes all copies. INSTANCE: changes only the selected element." },
-    { icon: "⚙️", label: "Edit Type", desc: "Properties → Edit Type. Changes parameters that affect ALL elements of that type." },
-    { icon: "📐", label: "Instance Parameters", desc: "Properties without Edit Type: changes only the selected element." },
-  ], diagram: null },
-  { id: 16, title: "Families — Part 3", topics: ["Family Editor", "Reference planes", "Extrusion", "Dimensional parameters"], objective: "Create a simple loadable family from scratch.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=family%20editor", videoQuery: "Revit family editor create family", steps: [
-    { icon: "📁", label: "Family Editor", desc: "File → New → Family. Choose a template (e.g. Generic Model.rft)." },
-    { icon: "✚", label: "Reference Planes", desc: "Create → Datum → Reference Plane. The skeleton geometry attaches to." },
-    { icon: "📦", label: "Extrusion", desc: "Create → Forms → Extrusion. 2D profile + depth = 3D solid." },
-    { icon: "📏", label: "Parameters", desc: "Add dimension → padlock → Label. The family becomes parametric." },
+    { icon: "✅", label: "Finish", desc: "Green checkmark to complete. Open boundary = error." },
+    { icon: "📐", label: "Edit Structure", desc: "Edit Type → Edit Structure: floor layers. In Landscape this is where you'll define sub-base, bedding and paving finish." },
+  ]},
+  { id: 5, section: "base", title: "Component & Column", topics: ["Loadable components", "Site components", "Load Family"], objective: "Insert components — street furniture, trees, equipment.", docsUrl: DOCS+"components", videoQuery: "Revit component placement tutorial", diagram: null, steps: [
+    { icon: "🪑", label: "Component Tool", desc: "Architecture → Build → Component. In Landscape: benches, bins, trees, lighting." },
+    { icon: "📦", label: "Load Family", desc: "Insert → Load Family from libraries. Massing & Site → Site Component for site elements." },
+  ]},
+  { id: 6, section: "base", title: "Materials", topics: ["Material browser", "Surface pattern", "Cut pattern"], objective: "Create materials — essential for paving and external finishes.", docsUrl: DOCS+"materials", videoQuery: "Revit materials tutorial", diagram: null, steps: [
+    { icon: "🎨", label: "Material Browser", desc: "Manage → Materials. Here you'll create paving, gravel, grass, asphalt materials." },
+    { icon: "➕", label: "Create material", desc: "Click + → rename (e.g. 'Paving_Granite_600x600')." },
+    { icon: "🖼️", label: "Surface Pattern", desc: "Graphics tab → Surface Pattern: how it looks in plan. For paving it's the slab pattern." },
+    { icon: "✂️", label: "Cut Pattern", desc: "Graphics tab → Cut Pattern: the hatch when the element is sectioned." },
+  ]},
+  { id: 7, section: "base", title: "Families — Part 1", topics: ["System vs Loadable vs In-place", "Parametric logic"], objective: "Understand families — Landscape uses in-place and profiles heavily.", docsUrl: DOCS+"families", videoQuery: "Revit families explained system loadable", diagram: null, steps: [
+    { icon: "📦", label: "What they are", desc: "Every element is a Family. Floors and Walls are system; trees and furniture are loadable; custom drainage will be in-place." },
+    { icon: "🧱", label: "System Families", desc: "Walls, floors, toposurface. They exist only inside the project." },
+    { icon: "📂", label: "Loadable Families", desc: ".rfa files: trees, furniture, profiles. Loaded from libraries." },
+    { icon: "✏️", label: "In-place Families", desc: "Unique geometry in the project. In Landscape: drainage that follows slopes, custom elements." },
+  ]},
+  { id: 8, section: "base", title: "Families — Part 2", topics: ["Type vs Instance", "Parameters"], objective: "Distinguish type and instance parameters.", docsUrl: DOCS+"type%20instance%20properties", videoQuery: "Revit type instance parameters", diagram: null, steps: [
+    { icon: "📋", label: "Type vs Instance", desc: "TYPE changes all copies (e.g. paving thickness). INSTANCE changes only the selected element (e.g. one floor's elevation)." },
+    { icon: "⚙️", label: "Edit Type", desc: "Properties → Edit Type. ALWAYS duplicate before modifying — golden rule." },
+  ]},
+  { id: 9, section: "base", title: "Families — Part 3", topics: ["Family Editor", "Reference planes", "Extrusion"], objective: "Create a family from scratch — preparation for Landscape profiles.", docsUrl: DOCS+"family%20editor", videoQuery: "Revit family editor create family", diagram: null, steps: [
+    { icon: "📁", label: "Family Editor", desc: "File → New → Family → choose template (e.g. Generic Model.rft)." },
+    { icon: "✚", label: "Reference Planes", desc: "Create → Datum → Reference Plane: the geometry skeleton." },
+    { icon: "📦", label: "Extrusion", desc: "Create → Forms → Extrusion: 2D profile + depth = solid." },
     { icon: "💾", label: "Load into Project", desc: "Create → Load into Project." },
-  ], diagram: null },
-  { id: 17, title: "Visibility & Graphics", topics: ["VG overrides", "Filters", "View templates"], objective: "Control view graphics and create reusable view templates.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=visibility%20graphics", videoQuery: "Revit visibility graphics overrides", steps: [
-    { icon: "👁️", label: "Open VG", desc: "Shortcut: VV. Opens Visibility/Graphics for the current view." },
-    { icon: "📂", label: "Category overrides", desc: "Model Categories: hide categories or change line colour/weight." },
-    { icon: "🔍", label: "Filters", desc: "Filters tab: parameter-based rules (e.g. show walls with Fire Rating 2h in red)." },
-    { icon: "📋", label: "View Template", desc: "View → View Templates → Create Template. Save reusable settings." },
-  ], diagram: null },
-  { id: 18, title: "Views and Sections", topics: ["Floor plans", "Elevations", "Sections", "Callout", "3D views"], objective: "Create and manage all view types for documentation.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=views%20sections", videoQuery: "Revit views sections tutorial", steps: [
-    { icon: "📐", label: "Floor Plan", desc: "View → Create → Plan Views → Floor Plan. Choose the level." },
-    { icon: "⬆️", label: "Elevation", desc: "View → Create → Elevation. Click to place the elevation symbol." },
-    { icon: "✂️", label: "Section", desc: "View → Create → Section. Draw the cut line." },
-    { icon: "🔍", label: "Callout", desc: "View → Create → Callout. Draw a rectangle over an area for a zoomed detail." },
-    { icon: "📦", label: "3D View", desc: "View → Create → 3D View → Default 3D View." },
-  ], diagram: null },
-  { id: 19, title: "Massing & Site", topics: ["Conceptual mass", "Model by face", "Toposurface", "Building pad"], objective: "Generate architectural elements from masses and model the site.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=massing%20site", videoQuery: "Revit massing site toposurface", steps: [
-    { icon: "🏗️", label: "Massing Tool", desc: "Massing & Site → Conceptual Mass → In-Place Mass." },
-    { icon: "🧱", label: "Model by Face", desc: "Select mass → Model by Face: creates walls/floors/roofs from faces." },
-    { icon: "🌍", label: "Toposurface", desc: "Massing & Site → Model Site → Toposurface. Click points with elevation." },
-    { icon: "⬛", label: "Building Pad", desc: "Massing & Site → Building Pad. Flat platform that cuts into the terrain." },
-  ], diagram: null },
-  { id: 20, title: "Design Options", topics: ["Option sets", "Variants", "Compare options"], objective: "Manage design variants in the same file.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=design%20options", videoQuery: "Revit design options tutorial", steps: [
-    { icon: "⚙️", label: "Design Options", desc: "Manage → Design Options. Create Option Set with different options." },
-    { icon: "✏️", label: "Edit option", desc: "Select option from the bottom menu → draw elements for that variant." },
-    { icon: "👁️", label: "Compare", desc: "In each view you can set which option to display." },
-    { icon: "✅", label: "Accept", desc: "Manage → Design Options → Accept Primary." },
-  ], diagram: null },
-  { id: 21, title: "Schedules", topics: ["Room schedule", "Door/window schedule", "Formulas", "Export to Excel"], objective: "Create automatic schedules extracted from the model.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=schedules", videoQuery: "Revit schedules tutorial", steps: [
-    { icon: "📊", label: "Create Schedule", desc: "View → Create → Schedules → Schedule/Quantities. Choose category." },
-    { icon: "➕", label: "Add fields", desc: "Fields tab: add parameters (Width, Height, Mark, Level)." },
-    { icon: "🔽", label: "Filter and sort", desc: "Filter + Sorting/Grouping tabs: group by type or level." },
-    { icon: "📤", label: "Export to Excel", desc: "File → Export → Reports → Schedule → .txt → open in Excel." },
-  ], diagram: null },
-  { id: 22, title: "Annotations", topics: ["Dimensions", "Text", "Tags", "Spot elevation"], objective: "Annotate views correctly for documentation.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=dimensions%20annotations", videoQuery: "Revit annotations dimensions tags", steps: [
-    { icon: "📏", label: "Aligned Dimension", desc: "Annotate → Dimension → Aligned. Click elements, then click away to place." },
-    { icon: "📝", label: "Text", desc: "Annotate → Text → Text. Click and type." },
-    { icon: "🏷️", label: "Tag by Category", desc: "Annotate → Tag → Tag by Category. Click element for automatic tag." },
-    { icon: "📍", label: "Spot Elevation", desc: "Annotate → Dimension → Spot Elevation. Click floor for absolute elevation." },
-  ], diagram: null },
-  { id: 23, title: "Sheets", topics: ["Create sheets", "Titleblock", "Views on sheet", "Revisions"], objective: "Compose and organise project sheets.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=sheets%20titleblock", videoQuery: "Revit sheets titleblock tutorial", steps: [
-    { icon: "📄", label: "New Sheet", desc: "View → Sheet Composition → Sheet. Choose titleblock." },
-    { icon: "🖼️", label: "Add views", desc: "From the Project Browser, drag a view onto the sheet." },
-    { icon: "📐", label: "Align views", desc: "Select viewports → Align (AL). Lock position with padlock." },
-    { icon: "📋", label: "Titleblock", desc: "Double-click titleblock to fill in sheet number, title, date." },
-  ], diagram: null },
-  { id: 24, title: "Links", topics: ["Link Revit models", "Overlay vs Attachment", "CAD link"], objective: "Link models from different disciplines.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=link%20models", videoQuery: "Revit link models CAD tutorial", steps: [
-    { icon: "🔗", label: "Insert Link", desc: "Insert → Link Revit. Choose the .rvt file to link." },
-    { icon: "⚙️", label: "Overlay vs Attachment", desc: "Overlay: doesn't propagate. Attachment: propagates. Default: Overlay." },
-    { icon: "📋", label: "Manage Links", desc: "Insert → Manage Links. Reload, remove or update links." },
-    { icon: "📂", label: "CAD Link", desc: "Insert → Link CAD. Links DWG as reference without embedding it." },
-  ], diagram: null },
-  { id: 25, title: "Manage & Coordinate", topics: ["Project base point", "Survey point", "Shared coordinates", "Copy/Monitor"], objective: "Manage coordinate systems between linked models.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=shared%20coordinates", videoQuery: "Revit manage coordinate copy monitor", steps: [
-    { icon: "📍", label: "Project Base Point", desc: "Internal reference point. Circle with X in plan view." },
-    { icon: "🌍", label: "Survey Point", desc: "Real geographic reference for coordinating with other models." },
-    { icon: "🔄", label: "Shared Coordinates", desc: "Manage → Coordinates → Acquire/Publish Coordinates." },
-    { icon: "👁️", label: "Copy/Monitor", desc: "Collaborate → Copy/Monitor. Copy levels/grids from linked model." },
-  ], diagram: null },
-  { id: 26, title: "Export", topics: ["DWG", "PDF", "IFC", "NWC Navisworks"], objective: "Export the model in the formats required by the project.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/?query=export%20dwg%20ifc", videoQuery: "Revit export DWG PDF IFC", steps: [
-    { icon: "📤", label: "Export DWG", desc: "File → Export → CAD Formats → DWG. Configure layer mapping." },
-    { icon: "🖨️", label: "Export PDF", desc: "File → Export → PDF (Revit 2022+)." },
-    { icon: "🔄", label: "Export IFC", desc: "File → Export → IFC. Configure schema and category mapping." },
-    { icon: "🏗️", label: "Export NWC", desc: "File → Export → NWC for clash detection in Navisworks." },
-  ], diagram: null },
-  { id: 27, title: "Final Project", topics: ["2-storey residential building", "From mass to documentation", "Export"], objective: "Apply the full curriculum on a real end-to-end project.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/", videoQuery: "Revit beginner full project tutorial", steps: [
-    { icon: "📋", label: "Brief", desc: "2-storey residential building. GF: living room, kitchen, bathroom. FF: 2 bedrooms, bathroom, terrace." },
-    { icon: "🏗️", label: "Phase 1 — Structure", desc: "Set up Levels and Grids. Create perimeter and internal walls on both levels." },
-    { icon: "🪟", label: "Phase 2 — Openings", desc: "Insert doors, windows, stairs, floors and roof." },
-    { icon: "📄", label: "Phase 3 — Documentation", desc: "Plans, elevations, sections, dimensions, tags, sheets." },
-    { icon: "📤", label: "Phase 4 — Export", desc: "DWG, PDF and IFC." },
-  ], diagram: null },
+  ]},
+  { id: 10, section: "base", title: "Stairs & Railing", topics: ["Stair by component", "Run", "Railing host"], objective: "Stairs and railings — recurring landscape elements.", docsUrl: DOCS+"stairs%20railings", videoQuery: "Revit stairs railing tutorial", diagram: null, steps: [
+    { icon: "🪜", label: "Stair Tool", desc: "Architecture → Circulation → Stair. Run for flights, automatic landings. Two options: sketch from scratch or use a standard type." },
+    { icon: "🔧", label: "Railing", desc: "Architecture → Circulation → Railing. On a host (stairs) or free sketch path." },
+  ]},
+  { id: 11, section: "base", title: "Visibility & Graphics", topics: ["VG overrides (VV)", "Filters", "View templates"], objective: "Control view graphics — essential for complex landscape plans.", docsUrl: DOCS+"visibility%20graphics", videoQuery: "Revit visibility graphics overrides", diagram: null, steps: [
+    { icon: "👁️", label: "Open VG", desc: "Shortcut VV. Category overrides, workset visibility." },
+    { icon: "🔍", label: "Filters", desc: "Parameter-based rules — e.g. colour all Soft Landscape green." },
+    { icon: "📋", label: "View Template", desc: "Save settings for reuse: General Arrangement, Grading Plan, Planting Plan." },
+  ]},
+  { id: 12, section: "base", title: "Views and Sections", topics: ["Floor plans", "Sections", "3D views", "Duplicate"], objective: "Create the views for landscape documentation.", docsUrl: DOCS+"views%20sections", videoQuery: "Revit views sections tutorial", diagram: null, steps: [
+    { icon: "📐", label: "Floor Plan", desc: "View → Plan Views → Floor Plan. In landscape: GA, Grading, Hard/Soft Landscape per level." },
+    { icon: "✂️", label: "Section", desc: "View → Section. Site-wide and detail." },
+    { icon: "📦", label: "3D View", desc: "Default 3D View. Use 2 tiled views (plan+3D) when working on terrain." },
+  ]},
+  { id: 13, section: "base", title: "Sheets", topics: ["Titleblock", "Viewport", "Output"], objective: "Compose project sheets.", docsUrl: DOCS+"sheets%20titleblock", videoQuery: "Revit sheets titleblock tutorial", diagram: null, steps: [
+    { icon: "📄", label: "New Sheet", desc: "View → Sheet. Drag views from the Project Browser." },
+    { icon: "📋", label: "Titleblock", desc: "Double-click to fill number, title, revision." },
+  ]},
+  { id: 14, section: "landscape", title: "BIM for Landscape", topics: ["Advantages & challenges", "No native tools", "EIR and project scale"], objective: "Understand the context: Landscape in Revit means bending architectural tools.", docsUrl: DOCS+"site%20design", videoQuery: "Revit landscape architecture BIM site design", diagram: null, steps: [
+    { icon: "💡", label: "The key principle", desc: "Revit has NO native Landscape tools. You'll use Floor for paving, Wall for retaining walls, Sweep for drainage and kerbs. This is the mindset to adopt." },
+    { icon: "✅", label: "Advantages", desc: "Integrated collaboration, schedules and budgets updated automatically as the design changes, real quantities (cut/fill, paving areas), rapid scenario analysis, lean approach with less waste." },
+    { icon: "⚠️", label: "Challenges", desc: "Toposurface built on triangles (not contours), no topo-paving interaction, many consultants still in 2D, software interoperability, initial user frustration — overcome with a good modelling strategy and training." },
+    { icon: "📋", label: "What drives the model", desc: "Scale, use, location, design and project phase — but above all what is contractually agreed with the client and written in the EIR." },
+  ]},
+  { id: 15, section: "landscape", title: "Worksets & Collaboration", topics: ["Central model", "Naming standard", "Typical division"], objective: "Set up multi-user collaboration with well-organised worksets.", docsUrl: DOCS+"worksets", videoQuery: "Revit worksets worksharing tutorial", diagram: null, steps: [
+    { icon: "🤝", label: "Central model", desc: "From day one you'll work in a shared central model, accessed by several users simultaneously. Worksets are the key to collaboration." },
+    { icon: "🏷️", label: "Naming convention", desc: "Field 1: Zone (optional — large projects split horizontally or vertically). Field 2: Content. Consistent, logical naming following company and ISO standards." },
+    { icon: "📂", label: "Site worksets", desc: "S-01_Components, S-02_Existing_Topography, S-03_Proposed_Topography, S-04_Existing_Planting, S-05_Entourage, S-06_Masses." },
+    { icon: "🧱", label: "Hard Landscape worksets", desc: "HL-01_Paving, HL-02_Stairs_Ramps_Railings, HL-03_Walls_Fences, HL-04_Furniture." },
+    { icon: "🌳", label: "Soft Landscape worksets", desc: "SL-01_Trees, SL-02_Planting, SL-03_Shrubs. This division matters later for sheets and visualisation setups." },
+  ]},
+  { id: 16, section: "landscape", title: "Landscape Views", topics: ["General Arrangement", "Grading Plan", "Hard/Soft Landscape"], objective: "Create the basic view set of a landscape project.", docsUrl: DOCS+"view%20templates", videoQuery: "Revit view templates site plan", diagram: null, steps: [
+    { icon: "📐", label: "Floorplans per level", desc: "General Arrangement, Grading and Levels, Hard Landscape and Furniture, Soft Landscape." },
+    { icon: "📦", label: "3D views", desc: "Site View, Tree and Planting views, Hardscape, Softscape." },
+    { icon: "⬆️", label: "Elevations and Sections", desc: "Site-wide elevations/sections + detail elevations/sections." },
+    { icon: "📋", label: "View Templates", desc: "Create a view template per view type so graphics stay consistent across the project." },
+  ]},
+  { id: 17, section: "landscape", title: "Paving — Floor Tool", topics: ["Floor as paving", "Duplicating types", "Layers"], objective: "Create external paving using the Floor tool.", docsUrl: DOCS+"floors", videoQuery: "Revit floor paving landscape tutorial", diagram: "paving", steps: [
+    { icon: "🧱", label: "The concept", desc: "Paving is the most common hard landscape element. Model it with the Floor tool: hosts families, top face at creation level, editable shape, matches architectural floors." },
+    { icon: "📋", label: "New paving type", desc: "Duplicate an existing floor → rename (e.g. Paving_Granite_60mm) → Edit Structure → change properties." },
+    { icon: "📚", label: "Add layers", desc: "Add as many layers as needed to describe your paving material: sub-base, bedding, finish. Each with its material and thickness." },
+    { icon: "🌱", label: "Soil and grass too", desc: "Same method for soil and grass: a floor with layers just like an architectural floor — the only difference is applying the proper hatches." },
+  ]},
+  { id: 18, section: "landscape", title: "2D Filled Patterns", topics: ["Model vs Drafting", "Surface pattern", "Filled regions"], objective: "Represent paving correctly in 2D plans.", docsUrl: DOCS+"fill%20patterns", videoQuery: "Revit fill patterns model drafting", diagram: null, steps: [
+    { icon: "🔲", label: "Two pattern types", desc: "Revit 'hatches' are Filled Patterns (PAT files). MODEL: fixed real size, adjusts with view scale — perfect for slabs, blocks, tiles but unreadable at large/small scales. DRAFTING: constant size at any scale — always readable but not true-size." },
+    { icon: "🎨", label: "Apply in the material", desc: "Floor editor → Material column → Material Editor → duplicate or create the material → define Surface and Cut patterns." },
+    { icon: "📐", label: "Or Filled Region", desc: "As a material property the pattern is a model element; as a filled region it's view-specific. No right or wrong — depends on project needs, you can even combine both for your Hard Landscape Plan." },
+  ]},
+  { id: 19, section: "landscape", title: "Grading & Levels", topics: ["Modify sub-elements", "Add point", "Split lines", "Slopes"], objective: "Give slopes and levels to paving — nothing is flat in Landscape.", docsUrl: DOCS+"modify%20sub%20elements%20floor", videoQuery: "Revit floor grading modify sub elements slope", diagram: "grading", steps: [
+    { icon: "💡", label: "Why it matters", desc: "Unlike architecture, external paving is rarely flat: falls and slopes are needed for drainage and to match existing levels. Select the floor → the shape editing tools appear in the ribbon." },
+    { icon: "🟩", label: "Divide into regular patterns", desc: "Divide paving into regular modules (e.g. squares) to control level changes easily and avoid the warning: 'Thickness of this Floor may be slightly inaccurate due to extreme Shape Editing'." },
+    { icon: "✏️", label: "Edit Boundary", desc: "Modifies the floor shape. WARNING: deleting/adding segments on an already-shaped floor resets elevations to 0. Move lines without deleting. Use dynamic dimensions by clicking the value." },
+    { icon: "📍", label: "Modify Sub-elements", desc: "Change the relative elevation of points, segments and split lines. Negative numbers = downward. This is how you create falls and slopes." },
+    { icon: "➕", label: "Add Point", desc: "Add points inside the boundary. In this mode Revit doesn't snap to model elements, only detail/model lines: sketch detail lines first as guides." },
+    { icon: "📏", label: "Add Split Lines", desc: "Create ridges and valleys. Automatically generates start and end points to assign levels to. Detail lines help place them precisely here too." },
+    { icon: "🔄", label: "Reset Shape", desc: "Returns the floor to flat, removing all modifications." },
+  ]},
+  { id: 20, section: "landscape", title: "Drainage", topics: ["Floor-based families", "Model in-place", "Sweep on path"], objective: "Model channels and drainage systems that follow slopes.", docsUrl: DOCS+"sweep", videoQuery: "Revit landscape drainage sweep model in place", diagram: "drainage", steps: [
+    { icon: "💡", label: "The problem", desc: "There is no drainage tool in Revit. Gratings and gullies = floor-based families (follow the slope). Continuous channels along slopes = model in-place with sweep." },
+    { icon: "📦", label: "Way 1 — Floor-based family", desc: "Load families from the Systems tab or libraries: applied to the floor they follow its slope. RULE: they must be floor-based, otherwise they will NOT follow the slope." },
+    { icon: "✏️", label: "Way 2 — Model In-Place", desc: "Architecture → Component → Model In-Place. Choose an appropriate category for future schedules: Specialty Equipment or Plumbing Fixture. Name the component describing element and size." },
+    { icon: "🛤️", label: "Sweep + Pick Path", desc: "Use Sweep (extrudes a profile along a path) → Pick Path → open a 3D view and select the sloped floor edge. A dashed plane appears where you define the profile." },
+    { icon: "📐", label: "Profile", desc: "Two options: sketch the profile directly, or select a loaded Metric Profile. Use the x/y axis bar to place it, a section view for exact distances, then green checkmark." },
+    { icon: "🔄", label: "Automatic update", desc: "If the floor changes level or slope: select the element → it updates according to the floor without redrawing path or profile. Then close the in-place editor." },
+  ]},
+  { id: 21, section: "landscape", title: "Creating a Profile", topics: ["Metric Profile family", "Closed profile", "Load"], objective: "Create custom profiles for drainage, kerbs and copping stones.", docsUrl: DOCS+"profile%20family", videoQuery: "Revit profile family tutorial", diagram: null, steps: [
+    { icon: "📁", label: "New family", desc: "File → New → Family → select the Metric Profile template." },
+    { icon: "✏️", label: "Draw the profile", desc: "In the 2D standard template draw with simple lines. RULE: the profile must be CLOSED." },
+    { icon: "💾", label: "Save and load", desc: "Save in the project profiles folder → Load into Project. Now selectable when using Sweep, Slab Edge and Wall Sweep." },
+  ]},
+  { id: 22, section: "landscape", title: "Kerbs (Curbs)", topics: ["Sloped vs flat", "Slab Edge tool"], objective: "Create sloped and flat kerbs.", docsUrl: DOCS+"slab%20edge", videoQuery: "Revit slab edge kerb curb", diagram: null, steps: [
+    { icon: "🔀", label: "Two ways", desc: "SLOPED kerb → same process as drainage (model in-place sweep on path). FLAT kerb → Slab Edge tool, faster." },
+    { icon: "📋", label: "Slab Edge", desc: "Duplicate the family → rename descriptively → pick the profile from the list → apply material with surface and cut patterns → OK → click the slab edge to apply." },
+    { icon: "📐", label: "Placement", desc: "Select the slab edge and press enter → constraints in the Properties panel help you position it correctly. The insertion point depends on how the profile was drawn in the Metric Profile family." },
+  ]},
+  { id: 23, section: "landscape", title: "Ramps in Landscape", topics: ["Sloped floor vs Ramp tool"], objective: "Create external ramps the practical way.", docsUrl: DOCS+"ramps", videoQuery: "Revit sloped floor ramp landscape", diagram: null, steps: [
+    { icon: "⚠️", label: "The Ramp tool is tricky", desc: "Revit has a dedicated Ramp tool under Architecture but it's awkward to use and manage." },
+    { icon: "✅", label: "Use Floors", desc: "Practical advice: use sloped floors (Modify Sub-elements, as in Grading). Easier to create, modify and match to surrounding paving." },
+  ]},
+  { id: 24, section: "landscape", title: "Railings & Fences", topics: ["Sketch path", "Host", "Handrails", "Template"], objective: "Model railings and fences — one of the most complex elements.", docsUrl: DOCS+"railings", videoQuery: "Revit railing fence tutorial", diagram: null, steps: [
+    { icon: "⚠️", label: "Honest premise", desc: "Railings are among Revit's most complex elements, hard to make behave as you want. Start from existing templates and fence/gate families when possible." },
+    { icon: "✏️", label: "Sketch Path", desc: "Architecture → Railing → Sketch Path. If the view isn't suitable, Revit asks you to pick one. Pick New Host to attach to floor, ramp or stair. Enable Preview to see the geometry while sketching." },
+    { icon: "🪜", label: "On stairs", desc: "The railing must be sketched along the inside line of the stair stringer to host and slope correctly. On component-based stairs choose placement on Treads or Stringer." },
+    { icon: "🔧", label: "Handrails", desc: "Up to 2 handrails per railing type. Modify type properties of the rail system (type and position), continuous rail (height, supports family) and supports (layout, spacing, justification, number)." },
+    { icon: "🔄", label: "Position", desc: "Flip Railing Direction (double arrow) to switch side. Tread/Stringer offset for fine adjustment: default 1/2 Stringer Width on stringers, 1 inch on treads." },
+    { icon: "🌐", label: "Free-standing", desc: "Railings can also be free-standing on a level, or attached to slab edges, wall tops, roofs, topography. Rails and balusters are placed automatically at even intervals, shapes defined by the loaded profile families." },
+  ]},
+  { id: 25, section: "landscape", title: "Retaining & Planter Walls", topics: ["Wall structure", "Sweeps", "Copping stone", "Foundation"], objective: "Retaining walls and planters with coping and foundations.", docsUrl: DOCS+"wall%20sweeps", videoQuery: "Revit retaining wall sweep coping", diagram: null, steps: [
+    { icon: "🧱", label: "Landscape uses", desc: "Walls in landscape are mostly: retaining walls, planter walls, balustrades. They are system families whose composition and thickness you customise." },
+    { icon: "📋", label: "Modify structure", desc: "ALWAYS duplicate the family before modifying → Edit Structure → Insert to add layers → up/down arrows to position them → assign materials." },
+    { icon: "👑", label: "Copping stone with Sweep", desc: "Typical in landscape: coping and foundation slab on the retaining wall. Fastest way: Wall Sweep. Add the profile (or create one — see Profile lesson) → apply the material to detail it → use parameters and offsets to place it top (coping) or bottom (foundation)." },
+    { icon: "📏", label: "Reveal", desc: "Use Reveals to create different patterns and grooves on the wall surface." },
+  ]},
+  { id: 26, section: "landscape", title: "Toposurface", topics: ["Place points", "Create from import", "TIN from Civil 3D"], objective: "Create topography — Revit's most challenging element.", docsUrl: DOCS+"toposurface", videoQuery: "Revit toposurface tutorial site", diagram: "topo", steps: [
+    { icon: "⚠️", label: "Know the limits", desc: "The toposurface doesn't behave like other elements: one single material extending infinitely (no layers or depths), few hostable families (mostly entourage), no voids, no water body tools, no interaction with hard landscape, triangles not contours." },
+    { icon: "📍", label: "Method 1 — Place Points", desc: "Massing & Site → Toposurface → Place Points: type the elevation and place manually. Tedious for big projects, fine for small areas. Use 2 views (plan + 3D) to see point depth." },
+    { icon: "📂", label: "Method 2 — Import DWG", desc: "Create from Import → Select Import Instance: Revit creates the toposurface from the points of the DWG (from AutoCAD or Civil 3D). Select only the layers containing the appropriate geometry. The most common method." },
+    { icon: "📄", label: "Method 3 — Point file", desc: "From an Excel/TXT coordinate file. Rarely used." },
+    { icon: "⭐", label: "Best practice — TIN", desc: "Revit triangulates the closest points, so from contours the result is often inaccurate. Ask the civil engineer (or survey) to export a TIN surface from Civil 3D to DWG: pick the vertices as points and the result is far more accurate." },
+  ]},
+  { id: 27, section: "landscape", title: "Split Surface", topics: ["Dividing toposurface", "Landform", "Paths"], objective: "Divide the topography to design paths and landforms.", docsUrl: DOCS+"split%20surface", videoQuery: "Revit split surface topography", diagram: null, steps: [
+    { icon: "✂️", label: "What it does", desc: "Splits the toposurface in two (max two surfaces at a time). Since there are no terrain drawing tools, Split is how you 'design' paths, terrain and landforms." },
+    { icon: "📂", label: "With a guide DWG", desc: "Best option: import a DWG with landforms/paths already drawn and pick the lines. Alternatively use detail lines as guides for picking." },
+    { icon: "✅", label: "Closed region", desc: "The sketch must form a properly enclosed region or Revit won't let you finish editing mode." },
+    { icon: "👁️", label: "Always two views", desc: "Work with plan + 3D tiled to check the result. Split doesn't change levels even with different slopes — it only divides surfaces so you can manage them. Apply the material before finishing the edit." },
+  ]},
+  { id: 28, section: "landscape", title: "Net / Cut / Fill", topics: ["Graded Region", "Cut and fill volumes"], objective: "Calculate cut and fill of the designed landform — a key project figure.", docsUrl: DOCS+"graded%20region", videoQuery: "Revit graded region cut fill toposurface", diagram: "cutfill", steps: [
+    { icon: "💡", label: "The task", desc: "One of the most common landscape requests: the Net/Cut/Fill of the designed landform. Achieved with the Graded Region tool." },
+    { icon: "✂️", label: "First: Split", desc: "Split the surface as in the previous lesson to isolate the intervention area." },
+    { icon: "📋", label: "Graded Region", desc: "Click Graded Region → a window opens: choose the FIRST option, 'Create a new toposurface exactly like the existing one' (both internal and perimeter points are copied). Revit creates a surface on top of the existing one where you can place points." },
+    { icon: "📍", label: "Place the points", desc: "Place points INSIDE the boundary of your landform or area. The new surface created will provide the required Net/Cut/Fill value." },
+    { icon: "📊", label: "Read the values", desc: "Select the created element → the Properties panel shows Net/Cut/Fill data in m³. The surface always stays editable; delete it and the terrain returns to its original form." },
+  ]},
+  { id: 29, section: "landscape", title: "Final Landscape Project", topics: ["Complete urban plaza", "From terrain to sheets"], objective: "Apply everything: a small public space end-to-end.", docsUrl: "https://help.autodesk.com/view/RVT/2025/ENU/", videoQuery: "Revit landscape site project tutorial", diagram: null, steps: [
+    { icon: "📋", label: "Brief", desc: "Small urban plaza: sloped paving, drainage channel, kerbs, retaining wall with copping stone, ramp, railing, terrain with landform." },
+    { icon: "🌍", label: "Phase 1 — Terrain", desc: "Create the toposurface, split for the paved area, calculate the landform cut/fill with Graded Region." },
+    { icon: "🧱", label: "Phase 2 — Hard Landscape", desc: "Paving with grading and slopes, drainage sweep on the edge, kerbs, retaining wall with copping stone, sloped-floor ramp, railing." },
+    { icon: "📄", label: "Phase 3 — Documentation", desc: "Grading plan with levels, General Arrangement, site-wide sections, sheets with view templates." },
+  ]},
 ];
+
+// ── SVG Diagrams ──────────────────────────────────────────────
+const DIAGRAMS = {
+  ui: (
+    <svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",maxWidth:"560px"}}>
+      <rect width="560" height="300" rx="8" fill="#ffffff"/>
+      <rect x="8" y="8" width="544" height="46" rx="4" fill="#e3f1e7" stroke="#22c55e" strokeWidth="1.5"/>
+      <text x="16" y="24" fill="#22c55e" fontSize="9" fontWeight="700">FILE</text>
+      <rect x="48" y="12" width="78" height="18" rx="3" fill="#22c55e" opacity="0.25"/>
+      <text x="52" y="24" fill="#15803d" fontSize="8" fontWeight="600">ARCHITECTURE</text>
+      <rect x="130" y="12" width="92" height="18" rx="3" fill="#22c55e" opacity="0.4"/>
+      <text x="134" y="24" fill="#15803d" fontSize="8" fontWeight="700">MASSING &amp; SITE ★</text>
+      <text x="232" y="24" fill="#7c8a80" fontSize="8">ANNOTATE</text>
+      <text x="292" y="24" fill="#7c8a80" fontSize="8">VIEW</text>
+      <rect x="48" y="32" width="490" height="18" rx="2" fill="#eef5ef"/>
+      <text x="55" y="44" fill="#15803d" fontSize="7">🧱 Wall</text>
+      <text x="105" y="44" fill="#15803d" fontSize="7">⬛ Floor</text>
+      <text x="155" y="44" fill="#15803d" fontSize="7">🌍 Toposurface</text>
+      <text x="235" y="44" fill="#15803d" fontSize="7">🪜 Stair</text>
+      <text x="285" y="44" fill="#15803d" fontSize="7">🔧 Railing</text>
+      <rect x="8" y="3" width="55" height="11" rx="3" fill="#22c55e"/>
+      <text x="12" y="11" fill="#0a2814" fontSize="7" fontWeight="700">① RIBBON</text>
+      <rect x="8" y="60" width="125" height="110" rx="4" fill="#eef5ef" stroke="#9b4ff7" strokeWidth="1.5"/>
+      <text x="14" y="74" fill="#7c3aed" fontSize="8" fontWeight="700">Properties</text>
+      <rect x="14" y="80" width="113" height="13" rx="2" fill="#eef1f7"/>
+      <text x="18" y="89" fill="#6b7280" fontSize="6">Paving_Granite_60mm</text>
+      <text x="14" y="104" fill="#7a8290" fontSize="6">Height Offset From Level</text>
+      <rect x="14" y="107" width="113" height="11" rx="2" fill="#eef1f7"/>
+      <text x="18" y="115" fill="#6b7280" fontSize="6">0.0</text>
+      <rect x="30" y="140" width="80" height="14" rx="3" fill="#9b4ff7" opacity="0.8"/>
+      <text x="48" y="150" fill="white" fontSize="7" fontWeight="600">Edit Type</text>
+      <rect x="8" y="55" width="85" height="11" rx="3" fill="#9b4ff7"/>
+      <text x="12" y="63" fill="white" fontSize="7" fontWeight="700">② PROPERTIES</text>
+      <rect x="8" y="178" width="125" height="114" rx="4" fill="#eef5ef" stroke="#3d7ef5" strokeWidth="1.5"/>
+      <text x="14" y="192" fill="#2563c9" fontSize="8" fontWeight="700">Project Browser</text>
+      <text x="14" y="206" fill="#7a8290" fontSize="6">▼ Floor Plans</text>
+      <text x="22" y="217" fill="#6b7280" fontSize="6">General Arrangement</text>
+      <text x="22" y="227" fill="#6b7280" fontSize="6">Grading and Levels</text>
+      <text x="22" y="237" fill="#6b7280" fontSize="6">Hard Landscape</text>
+      <text x="22" y="247" fill="#6b7280" fontSize="6">Soft Landscape</text>
+      <text x="14" y="260" fill="#7a8290" fontSize="6">▼ 3D Views</text>
+      <text x="22" y="271" fill="#6b7280" fontSize="6">Site View · Hardscape</text>
+      <rect x="8" y="173" width="105" height="11" rx="3" fill="#3d7ef5"/>
+      <text x="12" y="181" fill="white" fontSize="7" fontWeight="700">③ PROJECT BROWSER</text>
+      <rect x="141" y="60" width="411" height="232" rx="4" fill="#ffffff" stroke="#d4e3d8" strokeWidth="1"/>
+      <path d="M180 240 Q280 130 380 200 Q450 240 520 180" fill="none" stroke="#22c55e" strokeWidth="1.5" strokeDasharray="5,3" opacity="0.5"/>
+      <rect x="220" y="160" width="120" height="70" rx="2" fill="#22c55e" opacity="0.12" stroke="#22c55e" strokeWidth="1"/>
+      <text x="248" y="200" fill="#22c55e" fontSize="9" opacity="0.6">PAVING</text>
+      <text x="280" y="100" fill="#15803d" fontSize="10" textAnchor="middle">DRAWING AREA — SITE</text>
+      <rect x="141" y="55" width="95" height="11" rx="3" fill="#f59e0b"/>
+      <text x="145" y="63" fill="#1a1200" fontSize="7" fontWeight="700">④ DRAWING AREA</text>
+    </svg>
+  ),
+  floor: (
+    <svg viewBox="0 0 560 240" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",maxWidth:"560px"}}>
+      <rect width="560" height="240" rx="8" fill="#ffffff"/>
+      <text x="18" y="26" fill="#16241a" fontSize="13" fontWeight="700">Floor — the base of paving</text>
+      <rect x="15" y="40" width="165" height="150" rx="4" fill="#ffffff" stroke="#d4e3d8"/>
+      <text x="22" y="54" fill="#7a8290" fontSize="7">① Closed Sketch Boundary</text>
+      <rect x="35" y="65" width="125" height="100" rx="1" fill="none" stroke="#f59e0b" strokeWidth="2" strokeDasharray="6,3"/>
+      <rect x="195" y="40" width="165" height="150" rx="4" fill="#ffffff" stroke="#22c55e" strokeWidth="1.5"/>
+      <text x="202" y="54" fill="#22c55e" fontSize="7">② Finish → floor created</text>
+      <rect x="215" y="65" width="125" height="100" rx="1" fill="#22c55e" opacity="0.12" stroke="#22c55e" strokeWidth="1.5"/>
+      <line x1="215" y1="85" x2="340" y2="85" stroke="#22c55e" strokeWidth="0.4" opacity="0.4"/>
+      <line x1="215" y1="105" x2="340" y2="105" stroke="#22c55e" strokeWidth="0.4" opacity="0.4"/>
+      <line x1="215" y1="125" x2="340" y2="125" stroke="#22c55e" strokeWidth="0.4" opacity="0.4"/>
+      <line x1="245" y1="65" x2="245" y2="165" stroke="#22c55e" strokeWidth="0.4" opacity="0.4"/>
+      <line x1="285" y1="65" x2="285" y2="165" stroke="#22c55e" strokeWidth="0.4" opacity="0.4"/>
+      <text x="252" y="120" fill="#22c55e" fontSize="9">✓ Paving</text>
+      <rect x="375" y="40" width="170" height="150" rx="4" fill="#ffffff" stroke="#d4e3d8"/>
+      <text x="382" y="54" fill="#7a8290" fontSize="7">③ Edit Structure — layers</text>
+      <rect x="395" y="70" width="130" height="14" fill="#8a6d4a"/>
+      <text x="400" y="80" fill="#e8d8c0" fontSize="7">Finish — granite 60mm</text>
+      <rect x="395" y="84" width="130" height="20" fill="#6a5a40"/>
+      <text x="400" y="97" fill="#d8c8a8" fontSize="7">Bedding — sand 40mm</text>
+      <rect x="395" y="104" width="130" height="34" fill="#4a4438"/>
+      <text x="400" y="124" fill="#b8b098" fontSize="7">Sub-base — 200mm</text>
+      <text x="395" y="160" fill="#7a8290" fontSize="6">Each layer: material + thickness</text>
+      <text x="18" y="218" fill="#7c8a80" fontSize="8">Soil and grass = same process, different materials and hatches. The floor is the Swiss army knife of Landscape.</text>
+    </svg>
+  ),
+  paving: (
+    <svg viewBox="0 0 560 260" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",maxWidth:"560px"}}>
+      <rect width="560" height="260" rx="8" fill="#ffffff"/>
+      <text x="18" y="26" fill="#16241a" fontSize="13" fontWeight="700">Paving — full workflow</text>
+      <defs><marker id="arP" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#7c8a80"/></marker></defs>
+      <rect x="15" y="42" width="120" height="80" rx="6" fill="#eef5ef" stroke="#22c55e" strokeWidth="1.5"/>
+      <text x="25" y="60" fill="#22c55e" fontSize="9" fontWeight="700">1. Duplicate</text>
+      <text x="25" y="76" fill="#6b7280" fontSize="7">Existing floor →</text>
+      <text x="25" y="87" fill="#6b7280" fontSize="7">Duplicate →</text>
+      <text x="25" y="98" fill="#6b7280" fontSize="7">rename:</text>
+      <text x="25" y="110" fill="#15803d" fontSize="6">Paving_Granite_60mm</text>
+      <path d="M140 82 L155 82" stroke="#7c8a80" strokeWidth="2" markerEnd="url(#arP)"/>
+      <rect x="160" y="42" width="120" height="80" rx="6" fill="#eef5ef" stroke="#22c55e" strokeWidth="1.5"/>
+      <text x="170" y="60" fill="#22c55e" fontSize="9" fontWeight="700">2. Layers</text>
+      <text x="170" y="76" fill="#6b7280" fontSize="7">Edit Structure:</text>
+      <text x="170" y="88" fill="#6b7280" fontSize="7">finish + bedding</text>
+      <text x="170" y="99" fill="#6b7280" fontSize="7">+ sub-base, each</text>
+      <text x="170" y="110" fill="#6b7280" fontSize="7">with material</text>
+      <path d="M285 82 L300 82" stroke="#7c8a80" strokeWidth="2" markerEnd="url(#arP)"/>
+      <rect x="305" y="42" width="120" height="80" rx="6" fill="#eef5ef" stroke="#22c55e" strokeWidth="1.5"/>
+      <text x="315" y="60" fill="#22c55e" fontSize="9" fontWeight="700">3. Patterns</text>
+      <text x="315" y="76" fill="#6b7280" fontSize="7">Material Editor:</text>
+      <text x="315" y="88" fill="#6b7280" fontSize="7">Surface pattern (2D)</text>
+      <text x="315" y="99" fill="#6b7280" fontSize="7">+ Cut pattern</text>
+      <text x="315" y="110" fill="#6b7280" fontSize="7">(section)</text>
+      <path d="M430 82 L445 82" stroke="#7c8a80" strokeWidth="2" markerEnd="url(#arP)"/>
+      <rect x="450" y="42" width="95" height="80" rx="6" fill="#eef5ef" stroke="#f59e0b" strokeWidth="1.5"/>
+      <text x="460" y="60" fill="#f59e0b" fontSize="9" fontWeight="700">4. Grading</text>
+      <text x="460" y="76" fill="#6b7280" fontSize="7">Slopes with</text>
+      <text x="460" y="88" fill="#6b7280" fontSize="7">Modify Sub-</text>
+      <text x="460" y="99" fill="#6b7280" fontSize="7">elements</text>
+      <text x="460" y="110" fill="#6b7280" fontSize="7">(Grading lesson)</text>
+      <rect x="15" y="140" width="530" height="100" rx="6" fill="#ffffff" stroke="#d4e3d8"/>
+      <text x="25" y="158" fill="#7a8290" fontSize="8">Plan patterns — MODEL (real size, scales with view) vs DRAFTING (always readable)</text>
+      <rect x="30" y="170" width="230" height="55" fill="#eef5ef" stroke="#c0d2c5"/>
+      <line x1="30" y1="185" x2="260" y2="185" stroke="#22c55e" strokeWidth="0.5" opacity="0.5"/>
+      <line x1="30" y1="200" x2="260" y2="200" stroke="#22c55e" strokeWidth="0.5" opacity="0.5"/>
+      <line x1="30" y1="215" x2="260" y2="215" stroke="#22c55e" strokeWidth="0.5" opacity="0.5"/>
+      <line x1="70" y1="170" x2="70" y2="225" stroke="#22c55e" strokeWidth="0.5" opacity="0.5"/>
+      <line x1="110" y1="170" x2="110" y2="225" stroke="#22c55e" strokeWidth="0.5" opacity="0.5"/>
+      <line x1="150" y1="170" x2="150" y2="225" stroke="#22c55e" strokeWidth="0.5" opacity="0.5"/>
+      <line x1="190" y1="170" x2="190" y2="225" stroke="#22c55e" strokeWidth="0.5" opacity="0.5"/>
+      <line x1="230" y1="170" x2="230" y2="225" stroke="#22c55e" strokeWidth="0.5" opacity="0.5"/>
+      <text x="95" y="237" fill="#7c8a80" fontSize="7">MODEL — real 600x600 slabs</text>
+      <rect x="290" y="170" width="230" height="55" fill="#eef5ef" stroke="#c0d2c5"/>
+      <line x1="290" y1="178" x2="520" y2="178" stroke="#15803d" strokeWidth="0.4" opacity="0.6"/>
+      <line x1="290" y1="186" x2="520" y2="186" stroke="#15803d" strokeWidth="0.4" opacity="0.6"/>
+      <line x1="290" y1="194" x2="520" y2="194" stroke="#15803d" strokeWidth="0.4" opacity="0.6"/>
+      <line x1="290" y1="202" x2="520" y2="202" stroke="#15803d" strokeWidth="0.4" opacity="0.6"/>
+      <line x1="290" y1="210" x2="520" y2="210" stroke="#15803d" strokeWidth="0.4" opacity="0.6"/>
+      <line x1="290" y1="218" x2="520" y2="218" stroke="#15803d" strokeWidth="0.4" opacity="0.6"/>
+      <text x="355" y="237" fill="#7c8a80" fontSize="7">DRAFTING — fixed at any scale</text>
+    </svg>
+  ),
+  grading: (
+    <svg viewBox="0 0 560 280" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",maxWidth:"560px"}}>
+      <rect width="560" height="280" rx="8" fill="#ffffff"/>
+      <text x="18" y="26" fill="#16241a" fontSize="13" fontWeight="700">Grading — slopes on the floor</text>
+      <rect x="15" y="42" width="255" height="130" rx="4" fill="#ffffff" stroke="#d4e3d8"/>
+      <text x="24" y="58" fill="#7a8290" fontSize="8">PLAN — points and split lines</text>
+      <rect x="40" y="70" width="200" height="90" fill="#22c55e" opacity="0.08" stroke="#22c55e" strokeWidth="1"/>
+      <line x1="140" y1="70" x2="140" y2="160" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="5,3"/>
+      <text x="118" y="175" fill="#f59e0b" fontSize="7">split line (valley)</text>
+      <circle cx="40" cy="70" r="4" fill="#3d7ef5"/><text x="28" y="62" fill="#3d7ef5" fontSize="7">+0.00</text>
+      <circle cx="240" cy="70" r="4" fill="#3d7ef5"/><text x="228" y="62" fill="#3d7ef5" fontSize="7">+0.00</text>
+      <circle cx="40" cy="160" r="4" fill="#3d7ef5"/><text x="20" y="172" fill="#3d7ef5" fontSize="7">+0.00</text>
+      <circle cx="240" cy="160" r="4" fill="#3d7ef5"/><text x="245" y="172" fill="#3d7ef5" fontSize="7">+0.00</text>
+      <circle cx="140" cy="70" r="4" fill="#ef4444"/><text x="148" y="65" fill="#ef4444" fontSize="7">-0.15</text>
+      <circle cx="140" cy="160" r="4" fill="#ef4444"/><text x="148" y="155" fill="#ef4444" fontSize="7">-0.15</text>
+      <rect x="290" y="42" width="255" height="130" rx="4" fill="#ffffff" stroke="#d4e3d8"/>
+      <text x="299" y="58" fill="#7a8290" fontSize="8">SECTION — the valley created</text>
+      <path d="M310 100 L420 135 L530 100" fill="none" stroke="#22c55e" strokeWidth="2.5"/>
+      <path d="M310 100 L420 135 L530 100 L530 115 L420 150 L310 115 Z" fill="#22c55e" opacity="0.15"/>
+      <path d="M420 135 L420 155" stroke="#ef4444" strokeWidth="1" strokeDasharray="3,2"/>
+      <text x="428" y="152" fill="#ef4444" fontSize="7">-0.15 (drainage)</text>
+      <text x="318" y="92" fill="#3d7ef5" fontSize="7">±0.00</text>
+      <text x="505" y="92" fill="#3d7ef5" fontSize="7">±0.00</text>
+      <rect x="15" y="186" width="530" height="80" rx="6" fill="#ffffff" stroke="#d4e3d8"/>
+      <text x="25" y="204" fill="#f59e0b" fontSize="8" fontWeight="700">⚠️ Golden rules of Grading:</text>
+      <text x="25" y="220" fill="#6b7280" fontSize="8">1. Divide paving into regular modules — avoids the extreme Shape Editing warning</text>
+      <text x="25" y="234" fill="#6b7280" fontSize="8">2. In Edit Boundary do NOT delete segments on a shaped floor — elevations reset to 0</text>
+      <text x="25" y="248" fill="#6b7280" fontSize="8">3. Add Point doesn't snap to the model — sketch detail lines first as guides</text>
+      <text x="25" y="262" fill="#6b7280" fontSize="8">4. Negative numbers = downward. Reset Shape flattens everything</text>
+    </svg>
+  ),
+  drainage: (
+    <svg viewBox="0 0 560 270" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",maxWidth:"560px"}}>
+      <rect width="560" height="270" rx="8" fill="#ffffff"/>
+      <text x="18" y="26" fill="#16241a" fontSize="13" fontWeight="700">Drainage — sweep on a sloped path</text>
+      <rect x="15" y="42" width="530" height="120" rx="4" fill="#ffffff" stroke="#d4e3d8"/>
+      <text x="24" y="58" fill="#7a8290" fontSize="8">3D — the profile follows the sloped floor edge</text>
+      <path d="M60 130 L260 90 L460 120" fill="none" stroke="#22c55e" strokeWidth="3"/>
+      <path d="M60 130 L260 90 L460 120 L460 135 L260 105 L60 145 Z" fill="#22c55e" opacity="0.12"/>
+      <path d="M60 128 L260 88 L460 118" fill="none" stroke="#3d7ef5" strokeWidth="2" strokeDasharray="6,3"/>
+      <text x="200" y="78" fill="#3d7ef5" fontSize="8">Pick Path → floor edge (sloped)</text>
+      <rect x="48" y="118" width="14" height="16" rx="2" fill="none" stroke="#f59e0b" strokeWidth="1.5"/>
+      <path d="M51 122 L59 122 L59 130 L51 130 Z" fill="#f59e0b" opacity="0.3"/>
+      <text x="20" y="155" fill="#f59e0b" fontSize="7">Profile (Metric Profile)</text>
+      <text x="330" y="148" fill="#15803d" fontSize="7">→ the channel updates if the slope changes</text>
+      <rect x="15" y="176" width="255" height="84" rx="6" fill="#eef5ef" stroke="#22c55e" strokeWidth="1"/>
+      <text x="25" y="194" fill="#22c55e" fontSize="9" fontWeight="700">Way 1 — Floor-based family</text>
+      <text x="25" y="210" fill="#6b7280" fontSize="7">Point gratings and gullies. Applied to</text>
+      <text x="25" y="222" fill="#6b7280" fontSize="7">the floor they follow its slope.</text>
+      <text x="25" y="240" fill="#f59e0b" fontSize="7">⚠️ MUST be floor-based, otherwise</text>
+      <text x="25" y="252" fill="#f59e0b" fontSize="7">it won't follow the slope.</text>
+      <rect x="290" y="176" width="255" height="84" rx="6" fill="#eef5ef" stroke="#22c55e" strokeWidth="1"/>
+      <text x="300" y="194" fill="#22c55e" fontSize="9" fontWeight="700">Way 2 — Model In-Place + Sweep</text>
+      <text x="300" y="210" fill="#6b7280" fontSize="7">Continuous channels. Category: Specialty</text>
+      <text x="300" y="222" fill="#6b7280" fontSize="7">Equipment or Plumbing Fixture (schedules).</text>
+      <text x="300" y="238" fill="#6b7280" fontSize="7">Sweep → Pick Path → floor edge in 3D</text>
+      <text x="300" y="250" fill="#6b7280" fontSize="7">→ sketched profile or Metric Profile.</text>
+    </svg>
+  ),
+  topo: (
+    <svg viewBox="0 0 560 270" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",maxWidth:"560px"}}>
+      <rect width="560" height="270" rx="8" fill="#ffffff"/>
+      <text x="18" y="26" fill="#16241a" fontSize="13" fontWeight="700">Toposurface — triangles, not contours</text>
+      <rect x="15" y="42" width="255" height="140" rx="4" fill="#ffffff" stroke="#d4e3d8"/>
+      <text x="24" y="58" fill="#7a8290" fontSize="8">Revit triangulates points (TIN)</text>
+      <polygon points="50,150 110,80 170,140" fill="#22c55e" opacity="0.1" stroke="#22c55e" strokeWidth="0.8"/>
+      <polygon points="110,80 170,140 200,70" fill="#22c55e" opacity="0.15" stroke="#22c55e" strokeWidth="0.8"/>
+      <polygon points="170,140 200,70 250,130" fill="#22c55e" opacity="0.08" stroke="#22c55e" strokeWidth="0.8"/>
+      <polygon points="50,150 170,140 120,170" fill="#22c55e" opacity="0.12" stroke="#22c55e" strokeWidth="0.8"/>
+      <circle cx="50" cy="150" r="3" fill="#f59e0b"/><circle cx="110" cy="80" r="3" fill="#f59e0b"/>
+      <circle cx="170" cy="140" r="3" fill="#f59e0b"/><circle cx="200" cy="70" r="3" fill="#f59e0b"/>
+      <circle cx="250" cy="130" r="3" fill="#f59e0b"/><circle cx="120" cy="170" r="3" fill="#f59e0b"/>
+      <text x="60" y="178" fill="#f59e0b" fontSize="7">points with elevation → triangles</text>
+      <rect x="290" y="42" width="255" height="140" rx="4" fill="#ffffff" stroke="#d4e3d8"/>
+      <text x="299" y="58" fill="#7a8290" fontSize="8">⭐ Best practice — TIN from Civil 3D</text>
+      <defs><marker id="arT" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#7c8a80"/></marker></defs>
+      <rect x="310" y="70" width="90" height="30" rx="4" fill="#e3f1e7" stroke="#22c55e"/>
+      <text x="318" y="89" fill="#15803d" fontSize="8">Civil 3D — TIN</text>
+      <path d="M400 85 L425 85" stroke="#7c8a80" strokeWidth="2" markerEnd="url(#arT)"/>
+      <rect x="430" y="70" width="50" height="30" rx="4" fill="#e3f1e7" stroke="#22c55e"/>
+      <text x="442" y="89" fill="#15803d" fontSize="8">DWG</text>
+      <path d="M455 100 L455 120" stroke="#7c8a80" strokeWidth="2" markerEnd="url(#arT)"/>
+      <rect x="380" y="125" width="150" height="30" rx="4" fill="#e3f1e7" stroke="#22c55e" strokeWidth="1.5"/>
+      <text x="388" y="144" fill="#15803d" fontSize="8">Create from Import → vertices</text>
+      <text x="299" y="172" fill="#7a8290" fontSize="7">Far more accurate than contours</text>
+      <rect x="15" y="196" width="530" height="64" rx="6" fill="#ffffff" stroke="#d4e3d8"/>
+      <text x="25" y="214" fill="#ef4444" fontSize="8" fontWeight="700">⚠️ Toposurface limits:</text>
+      <text x="25" y="230" fill="#6b7280" fontSize="8">One single infinite material · no layers · no voids · no water bodies</text>
+      <text x="25" y="244" fill="#6b7280" fontSize="8">Few hostable families · no interaction with paving · triangles only</text>
+    </svg>
+  ),
+  cutfill: (
+    <svg viewBox="0 0 560 250" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",maxWidth:"560px"}}>
+      <rect width="560" height="250" rx="8" fill="#ffffff"/>
+      <text x="18" y="26" fill="#16241a" fontSize="13" fontWeight="700">Net / Cut / Fill — Graded Region</text>
+      <rect x="15" y="42" width="530" height="130" rx="4" fill="#ffffff" stroke="#d4e3d8"/>
+      <text x="24" y="58" fill="#7a8290" fontSize="8">SECTION — existing surface vs design</text>
+      <path d="M50 130 Q160 90 280 120 Q400 145 520 110" fill="none" stroke="#6b7280" strokeWidth="2" strokeDasharray="6,3"/>
+      <text x="55" y="120" fill="#6b7280" fontSize="7">existing</text>
+      <path d="M50 130 Q160 130 280 95 Q400 95 520 110" fill="none" stroke="#22c55e" strokeWidth="2.5"/>
+      <text x="290" y="88" fill="#22c55e" fontSize="7">design (graded region)</text>
+      <path d="M160 110 Q220 100 280 108 Q230 116 170 118 Z" fill="#ef4444" opacity="0.25"/>
+      <text x="200" y="112" fill="#ef4444" fontSize="8" fontWeight="700">CUT</text>
+      <path d="M300 100 Q380 96 460 116 Q380 128 310 112 Z" fill="#3d7ef5" opacity="0.25"/>
+      <text x="370" y="112" fill="#3d7ef5" fontSize="8" fontWeight="700">FILL</text>
+      <rect x="395" y="145" width="135" height="20" rx="3" fill="#e3f1e7" stroke="#22c55e"/>
+      <text x="403" y="158" fill="#15803d" fontSize="7">Properties → Net/Cut/Fill m³</text>
+      <rect x="15" y="186" width="530" height="50" rx="6" fill="#ffffff" stroke="#d4e3d8"/>
+      <text x="25" y="204" fill="#22c55e" fontSize="8" fontWeight="700">Workflow: Split surface → Graded Region → option 1 (exact copy) → points inside the boundary → read m³</text>
+      <text x="25" y="222" fill="#6b7280" fontSize="8">The surface stays editable. Delete it and the terrain returns to its original form.</text>
+    </svg>
+  )
+};
 
 const SYSTEM_PROMPT = (lesson, lang) => {
   const stepsText = (lesson.steps || []).map(s => `${s.icon} ${s.label}: ${s.desc}`).join("\n");
   return lang === "en"
-  ? `You are BIMentor, an AI tutor specialised in teaching Autodesk Revit to absolute beginners.
-You are direct, practical and patient — like an expert colleague sitting next to the user.
+  ? `You are BIMentor Landscape, an AI tutor specialised in teaching Autodesk Revit for Landscape Architecture.
+You are direct, practical and patient — like an expert landscape BIM specialist sitting next to the user.
+Key context: Revit has NO native landscape tools. The method taught here bends architectural tools to landscape use: Floor tool for paving and grading, Walls for retaining walls, Sweeps for drainage and kerbs, Toposurface for terrain. Worksets follow the S-xx / HL-xx / SL-xx convention.
 
 Current lesson: ${lesson.id} — "${lesson.title}"
 Topics: ${lesson.topics.join(", ")}
@@ -847,24 +695,25 @@ ${stepsText}
 RESPONSE RULES:
 - Always reply in ENGLISH
 - Do NOT use asterisks (**) or hashtags (###) — use emoji and plain text
-- Use emoji for section titles (e.g. "🖥️ THE RIBBON")
+- Use emoji for section titles (e.g. "🌍 TOPOSURFACE")
 - Be concise and practical, get to the point
 - Always propose a practical exercise at the end
 
 ANSWERING TECHNICAL QUESTIONS:
-- If the user asks a clear, specific question — even if it is about a topic from another lesson — ANSWER IT directly. Do NOT tell them they are in the wrong lesson or try to redirect them to the lesson path. Help with what they actually asked.
+- If the user asks a clear, specific question — even if it is about a topic from another lesson — ANSWER IT directly. Do NOT tell them they are in the wrong lesson or redirect them to the lesson path. Help with what they actually asked.
 - Adapt to the user's level: if their question shows experience, skip the basics; if they seem new, go step by step.
 
 WHEN YOU ARE NOT 100% SURE OF A PROCEDURE:
 - Do NOT invent steps or button names. It is better to verify than to give a confident wrong answer.
 - First, ask the user to send a screenshot of what they see on screen ("Send me a screenshot of your screen so I can guide you precisely").
 - When a screenshot arrives, analyse it carefully and give specific feedback based on what is actually shown.
-- Then point them to the official Autodesk documentation to confirm, using a search link relevant to THEIR specific question, in this format: https://help.autodesk.com/view/RVT/2025/ENU/?query=KEYWORDS (replace KEYWORDS with the exact topic of their question, e.g. "wall opening curtain wall").
+- Then point them to the official Autodesk documentation to confirm, using a search link relevant to THEIR specific question, in this format: https://help.autodesk.com/view/RVT/2025/ENU/?query=KEYWORDS (replace KEYWORDS with the exact topic, e.g. "toposurface split surface").
 
 CLOSING:
 - When you give a technical procedure, end with a relevant Autodesk documentation link in the format above, matched to the specific question — not a generic one.`
-  : `Sei BIMentor, un tutor AI per Autodesk Revit per principianti assoluti.
-Sei diretto, pratico e paziente — come un collega esperto seduto accanto all'utente.
+  : `Sei BIMentor Landscape, un tutor AI specializzato in Autodesk Revit per l'Architettura del Paesaggio.
+Sei diretto, pratico e paziente — come un BIM specialist landscape esperto seduto accanto all'utente.
+Contesto chiave: Revit NON ha tool nativi per il landscape. Il metodo insegnato qui piega i tool architettonici all'uso paesaggistico: Floor per paving e grading, Wall per muri di contenimento, Sweep per drainage e cordoli, Toposurface per il terreno. I worksets seguono la convenzione S-xx / HL-xx / SL-xx.
 
 Lezione corrente: ${lesson.id} — "${lesson.title}"
 Argomenti: ${lesson.topics.join(", ")}
@@ -876,19 +725,19 @@ ${stepsText}
 REGOLE DI RISPOSTA:
 - Rispondi SEMPRE in italiano
 - NON usare asterischi (**) o cancelletti (###) — usa emoji e testo normale
-- Usa emoji per i titoli delle sezioni (es: "🖥️ IL RIBBON")
+- Usa emoji per i titoli delle sezioni (es: "🌍 TOPOSURFACE")
 - Sii conciso e pratico, vai al punto
 - Proponi sempre un esercizio pratico alla fine
 
 RISPONDERE ALLE DOMANDE TECNICHE:
-- Se l'utente fa una domanda chiara e specifica — anche se riguarda un argomento di un'altra lezione — RISPONDI direttamente. NON dirgli che è nella lezione sbagliata e non cercare di riportarlo al percorso delle lezioni. Aiutalo su ciò che ha davvero chiesto.
+- Se l'utente fa una domanda chiara e specifica — anche se riguarda un argomento di un'altra lezione — RISPONDI direttamente. NON dirgli che è nella lezione sbagliata e non riportarlo al percorso delle lezioni. Aiutalo su ciò che ha davvero chiesto.
 - Adattati al livello dell'utente: se la domanda mostra esperienza, salta le basi; se sembra alle prime armi, vai passo per passo.
 
 QUANDO NON SEI SICURO AL 100% DI UNA PROCEDURA:
 - NON inventare passaggi o nomi di pulsanti. È meglio verificare che dare una risposta sbagliata con sicurezza.
 - Per prima cosa, chiedi all'utente di mandare uno screenshot di cosa vede a schermo ("Mandami uno screenshot del tuo schermo così ti guido con precisione").
 - Quando arriva uno screenshot, analizzalo con attenzione e dai un feedback specifico basato su ciò che è realmente mostrato.
-- Poi rimanda alla documentazione ufficiale Autodesk per conferma, con un link di ricerca pertinente alla SUA domanda specifica, in questo formato: https://help.autodesk.com/view/RVT/2025/ENU/?query=PAROLE (sostituisci PAROLE con l'argomento esatto della domanda, es. "wall opening curtain wall").
+- Poi rimanda alla documentazione ufficiale Autodesk per conferma, con un link di ricerca pertinente alla SUA domanda specifica, in questo formato: https://help.autodesk.com/view/RVT/2025/ENU/?query=PAROLE (sostituisci PAROLE con l'argomento esatto, es. "toposurface split surface").
 
 CHIUSURA:
 - Quando dai una procedura tecnica, chiudi con un link alla documentazione Autodesk nel formato sopra, mirato alla domanda specifica — non generico.`;
@@ -896,11 +745,11 @@ CHIUSURA:
 
 function renderText(text) {
   return text.split("\n").map((line, i) => {
-    if (line === "---") return <hr key={i} style={{ border: "none", borderTop: "1px solid #dfe4ee", margin: "10px 0" }} />;
+    if (line === "---") return <hr key={i} style={{ border: "none", borderTop: "1px solid #d4e3d8", margin: "10px 0" }} />;
     if (line.trim() === "") return <div key={i} style={{ height: "5px" }} />;
     if (line.startsWith("- ")) return (
       <div key={i} style={{ display: "flex", gap: "8px", marginBottom: "3px", paddingLeft: "4px" }}>
-        <span style={{ color: "#3d7ef5", flexShrink: 0 }}>›</span>
+        <span style={{ color: "#22c55e", flexShrink: 0 }}>›</span>
         <span>{line.slice(2)}</span>
       </div>
     );
@@ -908,7 +757,7 @@ function renderText(text) {
   });
 }
 
-export default function RevitTutor() {
+export default function LandscapeTutor() {
   const [currentLesson, setCurrentLesson] = useState(0);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -942,10 +791,8 @@ export default function RevitTutor() {
   };
 
   const callAPI = async (msgs) => {
-    // Filter out error messages from history and keep last 12 messages to avoid context issues
     const cleanMsgs = msgs.filter(m => !(m.role === "assistant" && (!m.rawContent || m.rawContent === "")));
     const trimmed = cleanMsgs.slice(-12);
-    // Ensure history starts with a user message (API requirement)
     const startIdx = trimmed.findIndex(m => m.role === "user");
     const validMsgs = startIdx >= 0 ? trimmed.slice(startIdx) : trimmed;
     const apiMsgs = validMsgs.map(m => ({
@@ -953,7 +800,6 @@ export default function RevitTutor() {
       content: m.role === "user" ? m.content : (m.rawContent || "...")
     }));
 
-    // Retry up to 2 times
     let lastError = "";
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
@@ -968,15 +814,12 @@ export default function RevitTutor() {
           body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 1500, system: SYSTEM_PROMPT(lesson, lang), messages: apiMsgs })
         });
         const data = await response.json();
-        if (data.error) {
-          lastError = data.error.message || JSON.stringify(data.error);
-          continue; // retry
-        }
+        if (data.error) { lastError = data.error.message || JSON.stringify(data.error); continue; }
         const text = data.content?.find(b => b.type === "text")?.text;
         if (text) return text;
-        lastError = "Risposta vuota dal server";
+        lastError = lang === "en" ? "Empty response from server" : "Risposta vuota dal server";
       } catch (e) {
-        lastError = e.message || "Errore di rete";
+        lastError = e.message || (lang === "en" ? "Network error" : "Errore di rete");
       }
     }
     throw new Error(lastError);
@@ -997,7 +840,7 @@ export default function RevitTutor() {
       const reply = await callAPI(newMsgs);
       setMessages(prev => [...prev, { role: "assistant", content: reply, rawContent: reply }]);
     } catch (e) {
-      setMessages(prev => [...prev, { role: "assistant", content: `⚠️ Errore: ${e.message}. Riprova tra qualche secondo.`, rawContent: "" }]);
+      setMessages(prev => [...prev, { role: "assistant", content: `⚠️ ${e.message}`, rawContent: "" }]);
     }
     setLoading(false);
   };
@@ -1008,7 +851,7 @@ export default function RevitTutor() {
       const reply = await callAPI([{ role: "user", content: t.startPrompt, rawContent: t.startPrompt }]);
       setMessages([{ role: "assistant", content: reply, rawContent: reply }]);
     } catch (e) {
-      setMessages([{ role: "assistant", content: `⚠️ Errore: ${e.message}. Clicca di nuovo "Inizia lezione".`, rawContent: "" }]);
+      setMessages([{ role: "assistant", content: `⚠️ ${e.message}`, rawContent: "" }]);
     }
     setLoading(false);
   };
@@ -1022,192 +865,188 @@ export default function RevitTutor() {
       const reply = await callAPI(newMsgs);
       setMessages(prev => [...prev, { role: "assistant", content: reply, rawContent: reply }]);
     } catch (e) {
-      setMessages(prev => [...prev, { role: "assistant", content: `⚠️ Error: ${e.message}. Please retry.`, rawContent: "" }]);
+      setMessages(prev => [...prev, { role: "assistant", content: `⚠️ ${e.message}`, rawContent: "" }]);
     }
     setLoading(false);
   };
 
   const handleKeyDown = (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } };
 
-  return (
-    <div style={{ display: "flex", height: "100vh", background: "#f4f6fb", color: "#1a1d28", fontFamily: "'Inter', system-ui, sans-serif", overflow: "hidden", position: "relative" }}>
+  let lastSection = null;
 
-      {/* Welcome modal */}
+  return (
+    <div style={{ display: "flex", height: "100vh", background: "#f3f8f4", color: "#16241a", fontFamily: "'Inter', system-ui, sans-serif", overflow: "hidden", position: "relative" }}>
+
       {showWelcome && (
-        <div style={{ position: "absolute", inset: 0, background: "rgba(230,235,245,0.92)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px", backdropFilter: "blur(4px)" }}>
-          <div style={{ maxWidth: "480px", width: "100%", maxHeight: "90vh", overflowY: "auto", background: "#ffffff", border: "1px solid #e9edf5", borderRadius: "16px", padding: "28px" }}>
+        <div style={{ position: "absolute", inset: 0, background: "rgba(228,238,230,0.93)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px", backdropFilter: "blur(4px)" }}>
+          <div style={{ maxWidth: "480px", width: "100%", maxHeight: "90vh", overflowY: "auto", background: "#ffffff", border: "1px solid #cfe2d5", borderRadius: "16px", padding: "28px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
-              <div style={{ width: "44px", height: "44px", background: "linear-gradient(135deg, #3d7ef5, #9b4ff7)", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "22px", flexShrink: 0 }}>⬡</div>
+              <div style={{ width: "44px", height: "44px", background: "linear-gradient(135deg, #22c55e, #0d9488)", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "22px", flexShrink: 0 }}>🌿</div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: "19px", fontWeight: "700", letterSpacing: "-0.3px" }}>{t.welcomeTitle}</div>
-                <div style={{ fontSize: "12px", color: "#7a8290" }}>{t.welcomeSubtitle}</div>
+                <div style={{ fontSize: "18px", fontWeight: "700", letterSpacing: "-0.3px" }}>{t.welcomeTitle}</div>
+                <div style={{ fontSize: "12px", color: "#8a92a0" }}>{t.welcomeSubtitle}</div>
               </div>
-              {/* Language selector */}
               <div style={{ display: "flex", gap: "4px", flexShrink: 0 }}>
                 {["it", "en"].map(l => (
-                  <button key={l} onClick={() => { setLang(l); setMessages([]); }} style={{ padding: "5px 10px", borderRadius: "6px", border: `1px solid ${lang === l ? "#3d7ef5" : "#dfe4ee"}`, background: lang === l ? "rgba(61,126,245,0.15)" : "transparent", color: lang === l ? "#3d7ef5" : "#7a8290", fontSize: "13px", cursor: "pointer", fontWeight: lang === l ? "700" : "400" }}>
+                  <button key={l} onClick={() => { setLang(l); setMessages([]); }} style={{ padding: "5px 10px", borderRadius: "6px", border: `1px solid ${lang === l ? "#22c55e" : "#cfe2d5"}`, background: lang === l ? "rgba(34,197,94,0.12)" : "transparent", color: lang === l ? "#22c55e" : "#8a92a0", fontSize: "13px", cursor: "pointer", fontWeight: lang === l ? "700" : "400" }}>
                     {l === "it" ? "🇮🇹" : "🇬🇧"}
                   </button>
                 ))}
               </div>
             </div>
-
-            <div style={{ fontSize: "13px", color: "#5a6270", lineHeight: "1.7", marginBottom: "20px" }}>
-              {t.welcomeIntro}
-            </div>
-
+            <div style={{ fontSize: "13px", color: "#6b7280", lineHeight: "1.7", marginBottom: "20px" }}>{t.welcomeIntro}</div>
             {t.welcomeFeatures.map((item, i) => (
-              <div key={i} style={{ display: "flex", gap: "12px", marginBottom: "12px", padding: "12px", background: "#f4f6fb", border: "1px solid #dfe4ee", borderRadius: "10px" }}>
+              <div key={i} style={{ display: "flex", gap: "12px", marginBottom: "12px", padding: "12px", background: "#f3f8f4", border: "1px solid #cfe2d5", borderRadius: "10px" }}>
                 <div style={{ fontSize: "20px", flexShrink: 0 }}>{item.icon}</div>
                 <div>
-                  <div style={{ fontSize: "13px", fontWeight: "600", color: "#aab0bca48", marginBottom: "2px" }}>{item.title}</div>
+                  <div style={{ fontSize: "13px", fontWeight: "600", color: "#2a3a30", marginBottom: "2px" }}>{item.title}</div>
                   <div style={{ fontSize: "12px", color: "#6b7280", lineHeight: "1.6" }}>{item.desc}</div>
                 </div>
               </div>
             ))}
-
-            <div style={{ fontSize: "12px", color: "#7a8290", lineHeight: "1.7", padding: "12px", background: "rgba(61,126,245,0.06)", border: "1px solid rgba(61,126,245,0.15)", borderRadius: "10px", marginBottom: "20px" }}>
-              💡 <span style={{ color: "#2563c9", fontWeight: "600" }}>{t.welcomeTip}</span> {t.welcomeTipText}
+            <div style={{ fontSize: "12px", color: "#6b7280", lineHeight: "1.7", padding: "12px", background: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.15)", borderRadius: "10px", marginBottom: "20px" }}>
+              💡 <span style={{ color: "#15803d", fontWeight: "600" }}>{t.welcomeTip}</span> {t.welcomeTipText}
             </div>
-
-            <button onClick={() => setShowWelcome(false)} style={{ width: "100%", padding: "13px", borderRadius: "10px", border: "none", background: "linear-gradient(135deg, #3d7ef5, #9b4ff7)", color: "white", fontWeight: "700", fontSize: "14px", cursor: "pointer" }}>
+            <button onClick={() => setShowWelcome(false)} style={{ width: "100%", padding: "13px", borderRadius: "10px", border: "none", background: "linear-gradient(135deg, #22c55e, #0d9488)", color: "#0a2814", fontWeight: "700", fontSize: "14px", cursor: "pointer" }}>
               {t.welcomeStart}
             </button>
           </div>
         </div>
       )}
 
-      {/* Sidebar */}
-      <div style={{ width: sidebarOpen ? "252px" : "0", minWidth: sidebarOpen ? "252px" : "0", background: "#ffffff", borderRight: "1px solid #dfe4ee", display: "flex", flexDirection: "column", overflow: "hidden", transition: "all 0.25s ease", flexShrink: 0 }}>
-        <div style={{ padding: "16px 14px", borderBottom: "1px solid #dfe4ee", flexShrink: 0 }}>
+      <div style={{ width: sidebarOpen ? "262px" : "0", minWidth: sidebarOpen ? "262px" : "0", background: "#ffffff", borderRight: "1px solid #dde9e0", display: "flex", flexDirection: "column", overflow: "hidden", transition: "all 0.25s ease", flexShrink: 0 }}>
+        <div style={{ padding: "16px 14px", borderBottom: "1px solid #dde9e0", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <div style={{ width: "32px", height: "32px", background: "linear-gradient(135deg, #3d7ef5, #9b4ff7)", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", flexShrink: 0 }}>⬡</div>
+            <div style={{ width: "32px", height: "32px", background: "linear-gradient(135deg, #22c55e, #0d9488)", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", flexShrink: 0 }}>🌿</div>
             <div>
               <div style={{ fontSize: "14px", fontWeight: "700", letterSpacing: "-0.3px" }}>BIMentor</div>
-              <div style={{ fontSize: "10px", color: "#c4ccda" }}>{t.appSubtitle}</div>
+              <div style={{ fontSize: "10px", color: "#7c8a80" }}>{t.appSubtitle}</div>
             </div>
           </div>
           <div style={{ marginTop: "12px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#c4ccda", marginBottom: "4px" }}>
-              <span>{t.progress}</span><span style={{ color: "#3d7ef5" }}>{currentLesson}/{curriculum.length}</span>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#7c8a80", marginBottom: "4px" }}>
+              <span>{t.progress}</span><span style={{ color: "#22c55e" }}>{currentLesson}/{curriculum.length}</span>
             </div>
-            <div style={{ height: "2px", background: "#dfe4ee", borderRadius: "2px" }}>
-              <div style={{ height: "100%", width: `${progress}%`, background: "linear-gradient(90deg, #3d7ef5, #9b4ff7)", borderRadius: "2px", transition: "width 0.4s" }} />
+            <div style={{ height: "2px", background: "#dde9e0", borderRadius: "2px" }}>
+              <div style={{ height: "100%", width: `${progress}%`, background: "linear-gradient(90deg, #22c55e, #0d9488)", borderRadius: "2px", transition: "width 0.4s" }} />
             </div>
           </div>
         </div>
         <div style={{ flex: 1, overflowY: "auto", padding: "4px" }}>
-          {curriculum.map((item, i) => (
-            <button key={item.id} onClick={() => setCurrentLesson(i)} style={{ width: "100%", textAlign: "left", padding: "7px 10px", borderRadius: "6px", border: "none", cursor: "pointer", marginBottom: "1px", background: currentLesson === i ? "rgba(61,126,245,0.1)" : "transparent", borderLeft: `2px solid ${currentLesson === i ? "#3d7ef5" : "transparent"}` }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
-                <span style={{ fontSize: "9px", fontWeight: "700", color: i < currentLesson ? "#3d7ef5" : currentLesson === i ? "#3d7ef5" : "#e9edf5", minWidth: "16px" }}>
-                  {i < currentLesson ? "✓" : String(item.id).padStart(2, "0")}
-                </span>
-                <span style={{ fontSize: "12px", color: currentLesson === i ? "#1a1d28" : i < currentLesson ? "#9aa2b0" : "#6b7280", fontWeight: currentLesson === i ? "600" : "400", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.title}</span>
-              </div>
-            </button>
-          ))}
+          {curriculum.map((item, i) => {
+            const showDivider = item.section !== lastSection;
+            lastSection = item.section;
+            return (
+              <React.Fragment key={item.id}>
+                {showDivider && (
+                  <div style={{ padding: "10px 12px 4px", fontSize: "9px", fontWeight: "700", letterSpacing: "1px", color: item.section === "landscape" ? "#22c55e" : "#7c8a80" }}>
+                    {item.section === "landscape" ? `🌿 ${t.sectionLandscape}` : t.sectionBase}
+                  </div>
+                )}
+                <button onClick={() => setCurrentLesson(i)} style={{ width: "100%", textAlign: "left", padding: "7px 10px", borderRadius: "6px", border: "none", cursor: "pointer", marginBottom: "1px", background: currentLesson === i ? "rgba(34,197,94,0.1)" : "transparent", borderLeft: `2px solid ${currentLesson === i ? "#22c55e" : "transparent"}` }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+                    <span style={{ fontSize: "9px", fontWeight: "700", color: i < currentLesson ? "#22c55e" : currentLesson === i ? "#22c55e" : "#cdddd0", minWidth: "16px" }}>
+                      {i < currentLesson ? "✓" : String(item.id).padStart(2, "0")}
+                    </span>
+                    <span style={{ fontSize: "12px", color: currentLesson === i ? "#16241a" : i < currentLesson ? "#7c8a80" : "#6b7280", fontWeight: currentLesson === i ? "600" : "400", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.title}</span>
+                  </div>
+                </button>
+              </React.Fragment>
+            );
+          })}
         </div>
       </div>
 
-      {/* Main */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
-        {/* Top bar */}
-        <div style={{ padding: "10px 16px", borderBottom: "1px solid #dfe4ee", display: "flex", alignItems: "center", gap: "10px", background: "#ffffff", flexShrink: 0 }}>
-          <button onClick={() => setSidebarOpen(o => !o)} style={{ background: "none", border: "none", color: "#aab0bc", cursor: "pointer", fontSize: "17px", padding: "2px", lineHeight: 1, flexShrink: 0 }}>☰</button>
+        <div style={{ padding: "10px 16px", borderBottom: "1px solid #dde9e0", display: "flex", alignItems: "center", gap: "10px", background: "#ffffff", flexShrink: 0 }}>
+          <button onClick={() => setSidebarOpen(o => !o)} style={{ background: "none", border: "none", color: "#c0d2c5", cursor: "pointer", fontSize: "17px", padding: "2px", lineHeight: 1, flexShrink: 0 }}>☰</button>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: "10px", color: "#aab0bc" }}>{t.lessonOf(lesson.id, curriculum.length)}</div>
+            <div style={{ fontSize: "10px", color: "#c0d2c5" }}>{t.lessonOf(lesson.id, curriculum.length)}</div>
             <div style={{ fontSize: "14px", fontWeight: "700", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{lesson.title}</div>
           </div>
           <div style={{ display: "flex", gap: "3px", flexShrink: 0 }}>
             {["it","en"].map(l => (
-              <button key={l} onClick={() => { setLang(l); setMessages([]); }} style={{ padding: "3px 7px", borderRadius: "5px", border: `1px solid ${lang === l ? "#3d7ef5" : "#dfe4ee"}`, background: lang === l ? "rgba(61,126,245,0.1)" : "transparent", color: lang === l ? "#3d7ef5" : "#9aa2b0", fontSize: "12px", cursor: "pointer" }}>
+              <button key={l} onClick={() => { setLang(l); setMessages([]); }} style={{ padding: "3px 7px", borderRadius: "5px", border: `1px solid ${lang === l ? "#22c55e" : "#dde9e0"}`, background: lang === l ? "rgba(34,197,94,0.1)" : "transparent", color: lang === l ? "#22c55e" : "#c0d2c5", fontSize: "12px", cursor: "pointer" }}>
                 {l === "it" ? "🇮🇹" : "🇬🇧"}
               </button>
             ))}
           </div>
-          <button onClick={() => setShowWelcome(true)} title={lang === "it" ? "Come si usa BIMentor" : "How to use BIMentor"} style={{ padding: "4px 9px", borderRadius: "5px", border: "1px solid #dfe4ee", background: "transparent", color: "#7a8290", cursor: "pointer", fontSize: "11px", flexShrink: 0 }}>?</button>
-          <a href={lesson.docsUrl} target="_blank" rel="noopener noreferrer" style={{ padding: "4px 10px", borderRadius: "5px", border: "1px solid #dfe4ee", background: "transparent", color: "#7a8290", textDecoration: "none", fontSize: "11px", flexShrink: 0 }}>📖 Docs</a>
-          <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(lesson.videoQuery || ("Revit " + lesson.title))}`} target="_blank" rel="noopener noreferrer" style={{ padding: "4px 10px", borderRadius: "5px", border: "1px solid #dfe4ee", background: "transparent", color: "#7a8290", textDecoration: "none", fontSize: "11px", flexShrink: 0 }}>{t.videoBtn || "🎥 Video"}</a>
+          <button onClick={() => setShowWelcome(true)} style={{ padding: "4px 9px", borderRadius: "5px", border: "1px solid #dde9e0", background: "transparent", color: "#8a92a0", cursor: "pointer", fontSize: "11px", flexShrink: 0 }}>?</button>
+          <a href={lesson.docsUrl} target="_blank" rel="noopener noreferrer" style={{ padding: "4px 10px", borderRadius: "5px", border: "1px solid #dde9e0", background: "transparent", color: "#8a92a0", textDecoration: "none", fontSize: "11px", flexShrink: 0 }}>{t.docsBtn}</a>
+          <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(lesson.videoQuery || ("Revit " + lesson.title))}`} target="_blank" rel="noopener noreferrer" style={{ padding: "4px 10px", borderRadius: "5px", border: "1px solid #dde9e0", background: "transparent", color: "#8a92a0", textDecoration: "none", fontSize: "11px", flexShrink: 0 }}>{t.videoBtn}</a>
           <div style={{ display: "flex", gap: "5px", flexShrink: 0 }}>
-            <button onClick={() => setCurrentLesson(i => Math.max(0, i - 1))} disabled={currentLesson === 0} style={{ padding: "4px 9px", borderRadius: "5px", border: "1px solid #dfe4ee", background: "transparent", color: currentLesson === 0 ? "#e4e9f2" : "#7a8290", cursor: currentLesson === 0 ? "not-allowed" : "pointer", fontSize: "11px" }}>{t.prev}</button>
-            <button onClick={() => setCurrentLesson(i => Math.min(curriculum.length - 1, i + 1))} disabled={currentLesson === curriculum.length - 1} style={{ padding: "4px 9px", borderRadius: "5px", border: "none", background: "linear-gradient(135deg, #3d7ef5, #9b4ff7)", color: "white", cursor: "pointer", fontSize: "11px", fontWeight: "600" }}>{t.next}</button>
+            <button onClick={() => setCurrentLesson(i => Math.max(0, i - 1))} disabled={currentLesson === 0} style={{ padding: "4px 9px", borderRadius: "5px", border: "1px solid #dde9e0", background: "transparent", color: currentLesson === 0 ? "#dde9e0" : "#8a92a0", cursor: currentLesson === 0 ? "not-allowed" : "pointer", fontSize: "11px" }}>{t.prev}</button>
+            <button onClick={() => setCurrentLesson(i => Math.min(curriculum.length - 1, i + 1))} disabled={currentLesson === curriculum.length - 1} style={{ padding: "4px 9px", borderRadius: "5px", border: "none", background: "linear-gradient(135deg, #22c55e, #0d9488)", color: "#0a2814", cursor: "pointer", fontSize: "11px", fontWeight: "700" }}>{t.next}</button>
           </div>
         </div>
 
-        {/* Tabs */}
-        <div style={{ display: "flex", borderBottom: "1px solid #dfe4ee", background: "#ffffff", flexShrink: 0 }}>
+        <div style={{ display: "flex", borderBottom: "1px solid #dde9e0", background: "#ffffff", flexShrink: 0 }}>
           {["chat", "steps"].map(tab => (
-            <button key={tab} onClick={() => setActiveTab(tab)} style={{ padding: "8px 16px", border: "none", background: "transparent", color: activeTab === tab ? "#3d7ef5" : "#aab0bc", fontSize: "12px", fontWeight: activeTab === tab ? "600" : "400", cursor: "pointer", borderBottom: `2px solid ${activeTab === tab ? "#3d7ef5" : "transparent"}` }}>
+            <button key={tab} onClick={() => setActiveTab(tab)} style={{ padding: "8px 16px", border: "none", background: "transparent", color: activeTab === tab ? "#22c55e" : "#c0d2c5", fontSize: "12px", fontWeight: activeTab === tab ? "600" : "400", cursor: "pointer", borderBottom: `2px solid ${activeTab === tab ? "#22c55e" : "transparent"}` }}>
               {tab === "chat" ? t.tabChat : t.tabSteps}
             </button>
           ))}
         </div>
 
-        {/* Steps tab */}
         {activeTab === "steps" && (
           <div style={{ flex: 1, overflowY: "auto", padding: "16px" }}>
-            <div style={{ marginBottom: "14px", padding: "12px", background: "#ffffff", border: "1px solid #dfe4ee", borderRadius: "8px" }}>
-              <div style={{ fontSize: "10px", color: "#aab0bc", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.5px" }}>{t.objective}</div>
+            <div style={{ marginBottom: "14px", padding: "12px", background: "#ffffff", border: "1px solid #dde9e0", borderRadius: "8px" }}>
+              <div style={{ fontSize: "10px", color: "#c0d2c5", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.5px" }}>{t.objective}</div>
               <div style={{ fontSize: "13px", color: "#6b7280", lineHeight: "1.6" }}>{lesson.objective}</div>
             </div>
-
-            {/* SVG Diagram */}
             {lesson.diagram && DIAGRAMS[lesson.diagram] && (
-              <div style={{ marginBottom: "14px", padding: "12px", background: "#f4f6fb", border: "1px solid #dfe4ee", borderRadius: "8px" }}>
-                <div style={{ fontSize: "10px", color: "#aab0bc", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.5px" }}>{t.diagram}</div>
+              <div style={{ marginBottom: "14px", padding: "12px", background: "#f3f8f4", border: "1px solid #dde9e0", borderRadius: "8px" }}>
+                <div style={{ fontSize: "10px", color: "#c0d2c5", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.5px" }}>{t.diagram}</div>
                 {DIAGRAMS[lesson.diagram]}
               </div>
             )}
-
-            <div style={{ fontSize: "10px", color: "#aab0bc", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.5px" }}>{t.steps}</div>
+            <div style={{ fontSize: "10px", color: "#c0d2c5", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.5px" }}>{t.steps}</div>
             {lesson.steps.map((step, i) => (
-              <div key={i} style={{ display: "flex", gap: "12px", marginBottom: "8px", padding: "12px 14px", background: "#ffffff", border: "1px solid #dfe4ee", borderRadius: "9px" }}>
+              <div key={i} style={{ display: "flex", gap: "12px", marginBottom: "8px", padding: "12px 14px", background: "#ffffff", border: "1px solid #dde9e0", borderRadius: "9px" }}>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", flexShrink: 0 }}>
-                  <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "rgba(61,126,245,0.1)", border: "1px solid rgba(61,126,245,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px" }}>{step.icon}</div>
-                  <div style={{ fontSize: "9px", fontWeight: "700", color: "#3d7ef5" }}>{String(i + 1).padStart(2, "0")}</div>
+                  <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.18)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px" }}>{step.icon}</div>
+                  <div style={{ fontSize: "9px", fontWeight: "700", color: "#22c55e" }}>{String(i + 1).padStart(2, "0")}</div>
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: "12px", fontWeight: "600", color: "#2a2d3a", marginBottom: "3px" }}>{step.label}</div>
-                  <div style={{ fontSize: "12px", color: "#7a8290", lineHeight: "1.6" }}>{step.desc}</div>
-                  <button onClick={() => askAboutStep(step)} style={{ marginTop: "8px", padding: "3px 10px", borderRadius: "5px", border: "1px solid #dfe4ee", background: "transparent", color: "#3d7ef5", fontSize: "11px", cursor: "pointer" }}>{t.askAI}</button>
+                  <div style={{ fontSize: "12px", fontWeight: "600", color: "#3a4a40", marginBottom: "3px" }}>{step.label}</div>
+                  <div style={{ fontSize: "12px", color: "#6b7280", lineHeight: "1.6" }}>{step.desc}</div>
+                  <button onClick={() => askAboutStep(step)} style={{ marginTop: "8px", padding: "3px 10px", borderRadius: "5px", border: "1px solid #dde9e0", background: "transparent", color: "#22c55e", fontSize: "11px", cursor: "pointer" }}>{t.askAI}</button>
                 </div>
               </div>
             ))}
-            <a href={lesson.docsUrl} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 14px", background: "#ffffff", border: "1px solid #dfe4ee", borderRadius: "8px", color: "#9aa2b0", textDecoration: "none", fontSize: "12px", marginTop: "4px" }}>
+            <a href={lesson.docsUrl} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 14px", background: "#ffffff", border: "1px solid #dde9e0", borderRadius: "8px", color: "#7c8a80", textDecoration: "none", fontSize: "12px", marginTop: "4px" }}>
               <span>📖</span><span>{t.officialDocs} — {lesson.title}</span><span style={{ marginLeft: "auto" }}>↗</span>
             </a>
-            <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(lesson.videoQuery || ("Revit " + lesson.title))}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 14px", background: "#ffffff", border: "1px solid #dfe4ee", borderRadius: "8px", color: "#9aa2b0", textDecoration: "none", fontSize: "12px", marginTop: "4px" }}>
-              <span>🎥</span><span>{t.videoBtn || "🎥 Video"} — YouTube</span><span style={{ marginLeft: "auto" }}>↗</span>
+            <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(lesson.videoQuery || ("Revit " + lesson.title))}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 14px", background: "#ffffff", border: "1px solid #dde9e0", borderRadius: "8px", color: "#7c8a80", textDecoration: "none", fontSize: "12px", marginTop: "4px" }}>
+              <span>🎥</span><span>{t.videoBtn} — YouTube</span><span style={{ marginLeft: "auto" }}>↗</span>
             </a>
           </div>
         )}
 
-        {/* Chat tab */}
         {activeTab === "chat" && (
           <>
             <div style={{ flex: 1, overflowY: "auto", padding: "16px" }}>
               {messages.length === 0 && (
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", gap: "14px", textAlign: "center" }}>
-                  <div style={{ width: "48px", height: "48px", background: "linear-gradient(135deg, #3d7ef5, #9b4ff7)", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "22px" }}>⬡</div>
+                  <div style={{ width: "48px", height: "48px", background: "linear-gradient(135deg, #22c55e, #0d9488)", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "22px" }}>🌿</div>
                   <div>
                     <div style={{ fontSize: "17px", fontWeight: "700", marginBottom: "5px" }}>{lesson.title}</div>
-                    <div style={{ fontSize: "12px", color: "#aab0bc", maxWidth: "300px", lineHeight: "1.6" }}>{lesson.objective}</div>
+                    <div style={{ fontSize: "12px", color: "#7c8a80", maxWidth: "300px", lineHeight: "1.6" }}>{lesson.objective}</div>
                   </div>
                   <div style={{ display: "flex", gap: "8px" }}>
-                    <button onClick={startLesson} style={{ padding: "9px 22px", borderRadius: "8px", border: "none", background: "linear-gradient(135deg, #3d7ef5, #9b4ff7)", color: "white", fontWeight: "700", fontSize: "13px", cursor: "pointer" }}>{t.startLesson}</button>
-                    <button onClick={() => setActiveTab("steps")} style={{ padding: "9px 16px", borderRadius: "8px", border: "1px solid #dfe4ee", background: "transparent", color: "#7a8290", fontSize: "13px", cursor: "pointer" }}>{t.viewGuide}</button>
+                    <button onClick={startLesson} style={{ padding: "9px 22px", borderRadius: "8px", border: "none", background: "linear-gradient(135deg, #22c55e, #0d9488)", color: "#0a2814", fontWeight: "700", fontSize: "13px", cursor: "pointer" }}>{t.startLesson}</button>
+                    <button onClick={() => setActiveTab("steps")} style={{ padding: "9px 16px", borderRadius: "8px", border: "1px solid #dde9e0", background: "transparent", color: "#8a92a0", fontSize: "13px", cursor: "pointer" }}>{t.viewGuide}</button>
                   </div>
                 </div>
               )}
               {messages.map((msg, i) => (
                 <div key={i} style={{ marginBottom: "14px", display: "flex", gap: "8px", flexDirection: msg.role === "user" ? "row-reverse" : "row" }}>
-                  <div style={{ width: "26px", height: "26px", borderRadius: "6px", flexShrink: 0, background: msg.role === "user" ? "#dfe4ee" : "linear-gradient(135deg, #3d7ef5, #9b4ff7)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px" }}>
-                    {msg.role === "user" ? "👤" : "⬡"}
+                  <div style={{ width: "26px", height: "26px", borderRadius: "6px", flexShrink: 0, background: msg.role === "user" ? "#dde9e0" : "linear-gradient(135deg, #22c55e, #0d9488)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px" }}>
+                    {msg.role === "user" ? "👤" : "🌿"}
                   </div>
                   <div style={{ maxWidth: "82%", minWidth: 0 }}>
-                    {msg.hasImage && <div style={{ marginBottom: "4px", fontSize: "10px", color: "#aab0bc" }}>{t.screenshotLabel}</div>}
-                    <div style={{ padding: "11px 13px", borderRadius: msg.role === "user" ? "11px 2px 11px 11px" : "2px 11px 11px 11px", background: msg.role === "user" ? "#e9edf5" : "#ffffff", border: "1px solid #dfe4ee", fontSize: "13px", color: "#3a4150" }}>
+                    {msg.hasImage && <div style={{ marginBottom: "4px", fontSize: "10px", color: "#c0d2c5" }}>{t.screenshotLabel}</div>}
+                    <div style={{ padding: "11px 13px", borderRadius: msg.role === "user" ? "11px 2px 11px 11px" : "2px 11px 11px 11px", background: msg.role === "user" ? "#e7f0e8" : "#ffffff", border: "1px solid #dde9e0", fontSize: "13px", color: "#3a4a40" }}>
                       {msg.role === "assistant" ? renderText(msg.content) : <span style={{ whiteSpace: "pre-wrap" }}>{msg.displayText || ""}</span>}
                     </div>
                   </div>
@@ -1215,40 +1054,40 @@ export default function RevitTutor() {
               ))}
               {loading && (
                 <div style={{ display: "flex", gap: "8px", marginBottom: "14px" }}>
-                  <div style={{ width: "26px", height: "26px", borderRadius: "6px", background: "linear-gradient(135deg, #3d7ef5, #9b4ff7)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px" }}>⬡</div>
-                  <div style={{ padding: "11px 13px", borderRadius: "2px 11px 11px 11px", background: "#ffffff", border: "1px solid #dfe4ee", display: "flex", gap: "4px", alignItems: "center" }}>
-                    {[0,1,2].map(j => <div key={j} style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#3d7ef5", animation: `pulse 1.2s ease-in-out ${j*0.2}s infinite` }} />)}
+                  <div style={{ width: "26px", height: "26px", borderRadius: "6px", background: "linear-gradient(135deg, #22c55e, #0d9488)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px" }}>🌿</div>
+                  <div style={{ padding: "11px 13px", borderRadius: "2px 11px 11px 11px", background: "#ffffff", border: "1px solid #dde9e0", display: "flex", gap: "4px", alignItems: "center" }}>
+                    {[0,1,2].map(j => <div key={j} style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#22c55e", animation: `pulse 1.2s ease-in-out ${j*0.2}s infinite` }} />)}
                   </div>
                 </div>
               )}
               <div ref={messagesEndRef} />
             </div>
             {imagePreview && (
-              <div style={{ padding: "7px 16px 0", display: "flex", alignItems: "center", gap: "7px", background: "#f4f6fb" }}>
-                <img src={imagePreview} style={{ height: "44px", borderRadius: "5px", border: "1px solid #dfe4ee" }} alt="preview" />
-                <button onClick={() => { setImageData(null); setImagePreview(null); }} style={{ background: "#dfe4ee", border: "none", color: "#6b7280", cursor: "pointer", borderRadius: "4px", padding: "2px 8px", fontSize: "11px" }}>✕</button>
+              <div style={{ padding: "7px 16px 0", display: "flex", alignItems: "center", gap: "7px", background: "#f3f8f4" }}>
+                <img src={imagePreview} style={{ height: "44px", borderRadius: "5px", border: "1px solid #dde9e0" }} alt="preview" />
+                <button onClick={() => { setImageData(null); setImagePreview(null); }} style={{ background: "#dde9e0", border: "none", color: "#6b7280", cursor: "pointer", borderRadius: "4px", padding: "2px 8px", fontSize: "11px" }}>✕</button>
               </div>
             )}
-            <div style={{ padding: "10px 16px", borderTop: "1px solid #dfe4ee", background: "#ffffff", flexShrink: 0 }}>
+            <div style={{ padding: "10px 16px", borderTop: "1px solid #dde9e0", background: "#ffffff", flexShrink: 0 }}>
               <div style={{ display: "flex", gap: "7px", alignItems: "flex-end" }}>
-                <button onClick={() => fileInputRef.current?.click()} title="Carica screenshot" style={{ padding: "7px", borderRadius: "7px", border: "1px solid #dfe4ee", background: "#f4f6fb", color: "#aab0bc", cursor: "pointer", fontSize: "15px", flexShrink: 0, lineHeight: 1 }}>📎</button>
+                <button onClick={() => fileInputRef.current?.click()} style={{ padding: "7px", borderRadius: "7px", border: "1px solid #dde9e0", background: "#f3f8f4", color: "#c0d2c5", cursor: "pointer", fontSize: "15px", flexShrink: 0, lineHeight: 1 }}>📎</button>
                 <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} style={{ display: "none" }} />
-                <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={handleKeyDown} placeholder="{t.inputPlaceholder}" rows={1}
-                  style={{ flex: 1, padding: "8px 12px", borderRadius: "7px", border: "1px solid #dfe4ee", background: "#f4f6fb", color: "#1a1d28", fontSize: "13px", resize: "none", outline: "none", fontFamily: "inherit", lineHeight: "1.5", maxHeight: "90px" }}
+                <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={handleKeyDown} placeholder={t.inputPlaceholder} rows={1}
+                  style={{ flex: 1, padding: "8px 12px", borderRadius: "7px", border: "1px solid #dde9e0", background: "#f3f8f4", color: "#16241a", fontSize: "13px", resize: "none", outline: "none", fontFamily: "inherit", lineHeight: "1.5", maxHeight: "90px" }}
                   onInput={e => { e.target.style.height = "auto"; e.target.style.height = Math.min(e.target.scrollHeight, 90) + "px"; }} />
                 <button onClick={sendMessage} disabled={loading || (!input.trim() && !imageData)}
-                  style={{ padding: "8px 14px", borderRadius: "7px", border: "none", background: loading || (!input.trim() && !imageData) ? "#dfe4ee" : "linear-gradient(135deg, #3d7ef5, #9b4ff7)", color: loading || (!input.trim() && !imageData) ? "#dfe4ee" : "white", cursor: loading || (!input.trim() && !imageData) ? "not-allowed" : "pointer", fontWeight: "600", fontSize: "12px", flexShrink: 0 }}>
+                  style={{ padding: "8px 14px", borderRadius: "7px", border: "none", background: loading || (!input.trim() && !imageData) ? "#dde9e0" : "linear-gradient(135deg, #22c55e, #0d9488)", color: loading || (!input.trim() && !imageData) ? "#cdddd0" : "#0a2814", cursor: loading || (!input.trim() && !imageData) ? "not-allowed" : "pointer", fontWeight: "700", fontSize: "12px", flexShrink: 0 }}>
                   {t.send}
                 </button>
               </div>
-              <div style={{ marginTop: "4px", fontSize: "10px", color: "#e4e9f2", textAlign: "center" }}>{t.inputHint}</div>
+              <div style={{ marginTop: "4px", fontSize: "10px", color: "#dde9e0", textAlign: "center" }}>{t.inputHint}</div>
             </div>
           </>
         )}
       </div>
       <style>{`
         @keyframes pulse { 0%,100%{opacity:0.3;transform:scale(0.8)} 50%{opacity:1;transform:scale(1)} }
-        ::-webkit-scrollbar{width:3px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#dfe4ee;border-radius:2px}
+        ::-webkit-scrollbar{width:3px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#dde9e0;border-radius:2px}
         *{box-sizing:border-box} a:hover{opacity:0.8} button:hover:not(:disabled){opacity:0.85}
       `}</style>
     </div>
