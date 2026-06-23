@@ -803,13 +803,10 @@ export default function LandscapeTutor() {
     let lastError = "";
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        const response = await fetch("https://api.anthropic.com/v1/messages", {
+        const response = await fetch("/api/chat", {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            "x-api-key": process.env.REACT_APP_ANTHROPIC_KEY || "",
-            "anthropic-version": "2023-06-01",
-            "anthropic-dangerous-direct-browser-access": "true"
+            "Content-Type": "application/json"
           },
           body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 1500, system: SYSTEM_PROMPT(lesson, lang), messages: apiMsgs })
         });
