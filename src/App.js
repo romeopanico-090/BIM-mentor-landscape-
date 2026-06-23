@@ -1,5 +1,18 @@
 import React, { useState, useRef, useEffect } from "react";
 
+// --- Tracking utilizzo (anonimo, privacy-friendly) ---
+const APP_NAME = "landscape";
+function track(event, payload) {
+  try {
+    fetch("/api/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ event, app: APP_NAME, ...payload })
+    });
+  } catch (e) {}
+}
+
+
 // ── Translations ──────────────────────────────────────────────
 const T = {
   it: {
@@ -777,7 +790,7 @@ export default function LandscapeTutor() {
   const progress = Math.round((currentLesson / curriculum.length) * 100);
 
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
-  useEffect(() => { setMessages([]); setImageData(null); setImagePreview(null); }, [currentLesson]);
+  useEffect(() => { setMessages([]); setImageData(null); setImagePreview(null); track("lesson_open", { lesson: curriculum[currentLesson]?.id, lessonTitle: curriculum[currentLesson]?.title, lang }); }, [currentLesson]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -823,6 +836,7 @@ export default function LandscapeTutor() {
   };
 
   const sendMessage = async () => {
+    track("message_sent", { lesson: lesson?.id, lessonTitle: lesson?.title, lang });
     const text = input.trim();
     if (!text && !imageData) return;
     const userContent = [];
@@ -885,7 +899,7 @@ export default function LandscapeTutor() {
               </div>
               <div style={{ display: "flex", gap: "4px", flexShrink: 0 }}>
                 {["it", "en"].map(l => (
-                  <button key={l} onClick={() => { setLang(l); setMessages([]); }} style={{ padding: "5px 10px", borderRadius: "6px", border: `1px solid ${lang === l ? "#22c55e" : "#cfe2d5"}`, background: lang === l ? "rgba(34,197,94,0.12)" : "transparent", color: lang === l ? "#22c55e" : "#8a92a0", fontSize: "13px", cursor: "pointer", fontWeight: lang === l ? "700" : "400" }}>
+                  <button key={l} onClick={() => { setLang(l); setMessages([]); track("lang_change", { lang: l }); }} style={{ padding: "5px 10px", borderRadius: "6px", border: `1px solid ${lang === l ? "#22c55e" : "#cfe2d5"}`, background: lang === l ? "rgba(34,197,94,0.12)" : "transparent", color: lang === l ? "#22c55e" : "#8a92a0", fontSize: "13px", cursor: "pointer", fontWeight: lang === l ? "700" : "400" }}>
                     {l === "it" ? "🇮🇹" : "🇬🇧"}
                   </button>
                 ))}
@@ -963,7 +977,7 @@ export default function LandscapeTutor() {
           </div>
           <div style={{ display: "flex", gap: "3px", flexShrink: 0 }}>
             {["it","en"].map(l => (
-              <button key={l} onClick={() => { setLang(l); setMessages([]); }} style={{ padding: "3px 7px", borderRadius: "5px", border: `1px solid ${lang === l ? "#22c55e" : "#dde9e0"}`, background: lang === l ? "rgba(34,197,94,0.1)" : "transparent", color: lang === l ? "#22c55e" : "#c0d2c5", fontSize: "12px", cursor: "pointer" }}>
+              <button key={l} onClick={() => { setLang(l); setMessages([]); track("lang_change", { lang: l }); }} style={{ padding: "3px 7px", borderRadius: "5px", border: `1px solid ${lang === l ? "#22c55e" : "#dde9e0"}`, background: lang === l ? "rgba(34,197,94,0.1)" : "transparent", color: lang === l ? "#22c55e" : "#c0d2c5", fontSize: "12px", cursor: "pointer" }}>
                 {l === "it" ? "🇮🇹" : "🇬🇧"}
               </button>
             ))}
